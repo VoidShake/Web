@@ -39,14 +39,15 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
   const { db } = await database()
 
-  const name = params?.pack
-  const { installedAddons }: IPack = await db.collection('packs').findOne({ name })
+  const pack: IPack = await db.collection('packs').findOne({ slug: params?.pack })
 
-  const addons: Array<Partial<IMod> & { id: number }> = installedAddons
+  if (!pack) return { notFound: true }
+
+  const addons: Array<Partial<IMod> & { id: number }> = pack.installedAddons
     .filter(a => a.installedFile.categorySectionPackageType !== 3)
     .map(({ addonID }) => ({
       id: addonID,
-      library: installedAddons.some(a => a.installedFile.dependencies.some(d => d.addonId === addonID))
+      library: pack.installedAddons.some(a => a.installedFile.dependencies.some(d => d.addonId === addonID))
     }))
 
   const mods: IMod[] = await Promise.all(addons.map(async a => {
@@ -66,7 +67,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     return (ia - ib) + (b.popularityScore - a.popularityScore)
   })
 
-  return { props: { mods: sorted, name } }
+  return { props: { mods: sorted, name: pack.name } }
 
 }
 
