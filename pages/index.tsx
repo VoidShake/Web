@@ -24,7 +24,7 @@ const Home: FC<{
 export const getServerSideProps: GetServerSideProps = async () => {
 
   const { db } = await database()
-  const rawPacks: IPack[] = await db.collection('packs').find().toArray()
+  const rawPacks = await db.collection<IPack>('packs').find().toArray()
 
   if (process.env.NODE_ENV === 'development') {
     const manifest = readFileSync('C:\\Users\\nik\\curseforge\\minecraft\\Instances\\Steampunk & Dragons\\minecraftinstance.json').toString()

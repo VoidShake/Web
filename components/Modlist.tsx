@@ -53,9 +53,9 @@ const Mod: FC<IMod> = ({ websiteUrl, name, icon, library }) => {
 
    return <InvisibleLink href={websiteUrl}>
       <Card>
+         <img src={icon} />
          <h3>{name}</h3>
          {library && <span>Lib</span>}
-         <img src={icon} />
       </Card>
    </InvisibleLink>
 }
@@ -63,17 +63,25 @@ const Mod: FC<IMod> = ({ websiteUrl, name, icon, library }) => {
 const Card = styled.div`
    text-align: center;
    perspective: 40px;
-   background: #FFF2;
+   background: #0002;
 
    transform: translateY(0);
-   transition: transform 0.1s linear;
+   transition: all 0.1s linear;
+
    &:hover {
       transform: translateY(-0.4rem);
+      background: #DDD;
+      color: black;
    }
 
+   display: grid;
+   align-items: center;
+
+   grid-template: 
+      "image"
+      "title" 4rem;
+
    h3 {
-      margin-bottom: 1rem;
-      height: 3.5rem;
       padding: 1rem 0;
    }
 

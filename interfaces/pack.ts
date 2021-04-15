@@ -1,3 +1,5 @@
+import IPage from "./page";
+
 export default interface IPack {
    _id: string
    name: string
@@ -12,4 +14,5 @@ export default interface IPack {
          }[]
       }
    }[]
+   pages?: IPage[]
 }
