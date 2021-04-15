@@ -40,7 +40,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const name = params?.pack
   const { installedAddons }: IPack = await db.collection('packs').findOne({ name })
 
-  const addons: Partial<IMod>[] = installedAddons
+  const addons: Array<Partial<IMod> & { id: number }> = installedAddons
     .filter(a => a.installedFile.categorySectionPackageType !== 3)
     .map(({ addonID }) => ({
       id: addonID,
@@ -48,13 +48,13 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     }))
 
   const mods: IMod[] = await Promise.all(addons.map(async a => {
-    const { attachments, primaryCategoryId, categories, ...mod } = await getMod(a.id!)
+    const { attachments, primaryCategoryId, categories, ...mod } = await getMod(a.id)
 
     const libIds = [421, 425, 423, 435]
 
     return {
       ...a, ...mod,
-      library: a.library && [421, 425].includes(primaryCategoryId) && categories.every(c => libIds.includes(c.categoryId)),
+      library: !!(a.library && [421, 425].includes(primaryCategoryId) && categories.every(c => libIds.includes(c.categoryId))),
       icon: attachments.find(a => a.isDefault)?.thumbnailUrl
     }
   }))

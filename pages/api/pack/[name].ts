@@ -1,9 +1,7 @@
 import type { NextApiHandler } from 'next'
 import database from '../../../database'
-import middleware from '../../../middleware'
 
 const handler: NextApiHandler = async (req, res) => {
-   await middleware(req, res)
    const { name } = req.query
 
    const { db } = await database()

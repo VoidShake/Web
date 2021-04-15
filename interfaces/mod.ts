@@ -3,7 +3,7 @@ export default interface IMod {
    name: string
    library: boolean
    websiteUrl?: string
-   summary: string
-   icon: string
+   summary?: string
+   icon?: string
    popularityScore: number
 }
