@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import Link from 'next/link'
 import { FC } from 'react'
 import Layout from '../components/Layout'
@@ -14,7 +14,7 @@ const Home: FC<{ packs: IPack[] }> = ({ packs }) => (
   </Layout>
 )
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
 
   const { db } = await database()
   const packs = await db.collection('packs').find().toArray()
