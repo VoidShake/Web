@@ -1,15 +1,26 @@
+import { GetStaticProps } from 'next'
 import Link from 'next/link'
+import { FC } from 'react'
 import Layout from '../components/Layout'
+import database from '../database'
+import IPack from '../interfaces/pack'
 
-const IndexPage = () => (
-  <Layout title="Home | Next.js + TypeScript Example">
-    <h1>Hello Next.js 👋</h1>
-    <p>
-      <Link href="/about">
-        <a>About</a>
-      </Link>
-    </p>
+const Home: FC<{ packs: IPack[] }> = ({ packs }) => (
+  <Layout>
+    <h1>Browse packs</h1>
+    {packs.map(pack =>
+      <Link key={pack._id} href={`/${pack.name}`}>{pack.name}</Link>
+    )}
   </Layout>
 )
 
-export default IndexPage
+export const getStaticProps: GetStaticProps = async () => {
+
+  const { db } = await database()
+  const packs = await db.collection('packs').find().toArray()
+
+  return { props: { packs: JSON.parse(JSON.stringify(packs)) } }
+
+}
+
+export default Home
