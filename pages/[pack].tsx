@@ -1,4 +1,4 @@
-import { GetStaticPaths, GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import { FC } from 'react'
 import Layout from '../components/Layout'
 import Modlist from '../components/Modlist'
@@ -21,6 +21,7 @@ const PackView: FC<{ mods: IMod[], name: string }> = ({ mods, name }) => {
   )
 }
 
+/*
 export const getStaticPaths: GetStaticPaths = async () => {
 
   const { db } = await database()
@@ -32,8 +33,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return { paths, fallback: false }
 }
+*/
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
   const { db } = await database()
 
