@@ -28,7 +28,7 @@ const handler = validate({
       const slug = slugify(req.body.title, { lower: true })
       const { pack } = req.body
 
-      const mods = req.body.mods.map((m: unknown) => typeof m === 'object' ? m : { slug: m, relevance: 'major' })
+      const mods = req.body.mods.map((m: unknown) => typeof m === 'object' ? m : { slug: m, relevance: Relevance.MINOR })
 
       await db.collection('pages').updateOne({ slug, pack }, { $set: { ...req.body, slug, mods } }, { upsert: true })
       return res.status(204).end()
