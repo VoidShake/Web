@@ -1,23 +1,37 @@
-import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { flatten, uniqBy } from 'lodash';
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import IMod from "../interfaces/mod";
-import InvisibleLink from "./InvisibleLink";
+import ModCard from "./ModCard";
 
 const HIDDEN_CATEGORIES = [4780]
 
-const Modlist: FC<{ mods: IMod[] }> = ({ mods }) => {
+const Modlist: FC<{
+   mods: IMod[]
+   onHover?: (mod?: IMod) => void
+}> = ({ mods, ...events }) => {
 
-   const libs = useMemo(() => mods.filter(m => m.library), [mods])
+   const libs = useMemo(() => mods.filter(m => m.library).length, [mods])
    const categories = useMemo(() => uniqBy(flatten(mods
       .map(m => m.categories)), c => c.categoryId)
       .filter(c => !HIDDEN_CATEGORIES.includes(c.categoryId)),
       [mods]
    )
 
+   const rank = useCallback((mod: IMod) => {
+      let rank = mod.popularityScore
+      if (mod.library) rank -= 100000000000
+      if (mod.pages?.some(p => p.mods.find(m => m.slug === mod.slug && m.relevance === 'major'))) rank += 1000000000
+      return rank
+   }, [])
+
+   const sorted = useMemo(() => mods
+      .sort((a, b) => rank(b) - rank(a)),
+      [mods]
+   )
+
    return <Container>
-      <p>{mods.length - libs.length} mods ({libs.length} libraries)</p>
+      <p>{mods.length - libs} mods ({libs} libraries)</p>
 
       <Categories>
          {categories.map(({ categoryId, name }) =>
@@ -26,7 +40,12 @@ const Modlist: FC<{ mods: IMod[] }> = ({ mods }) => {
       </Categories>
 
       <Grid>
-         {mods.map(mod => <Mod key={mod.id} {...mod} />)}
+         {sorted.map(mod => <ModCard
+            {...mod}
+            onHover={() => events.onHover?.(mod)}
+            onBlur={() => events.onHover?.()}
+            key={mod.id}
+         />)}
       </Grid>
 
    </Container>
@@ -51,7 +70,7 @@ const Container = styled.div`
    text-align: center;
 `
 
-const Grid = styled.ul`
+export const Grid = styled.ul`
   display: grid;
   grid-template-columns: repeat(auto-fill, 200px);
   justify-content: center;
@@ -59,78 +78,6 @@ const Grid = styled.ul`
   gap: 1rem;
   padding: 2rem;
   list-style: none;
-`
-
-const Mod: FC<IMod> = ({ websiteUrl, name, icon, library }) => {
-
-   /*
-   const [scale, setScale] = useState([0, 0])
-
-   const innerStyle = css`
-      transform: rotateX(${scale[0]}deg) rotateY(${scale[1]}deg);
-   `
-
-      const resetCard = useCallback(() => setScale([0, 0]), [setScale])
-   
-      const updateCard = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-         const box = e.currentTarget.getBoundingClientRect()
-         const x = (e.clientX - box.x) / box.width - 0.5
-         const y = (e.clientY - box.y) / box.height - 0.5
-         setScale([-y, x])
-      }, [setScale])
-   */
-
-   return <InvisibleLink href={websiteUrl}>
-      <Card library={library}>
-         <img src={icon} />
-         <h3>{name}</h3>
-         {library && <span>Library</span>}
-      </Card>
-   </InvisibleLink>
-}
-
-const Card = styled.div<{ library: boolean }>`
-   text-align: center;
-   perspective: 40px;
-   background: #0002;
-   
-   ${p => p.library && css`
-      background: #559aed77;
-   `}
-
-   span {
-      background: #0006;
-      margin: 0.2rem;
-      margin-left: auto;
-      padding: 0.2rem 0.5rem;
-      border-radius: 99999px;
-   }
-
-   transform: translateY(0);
-   transition: all 0.1s linear;
-
-   &:hover {
-      transform: translateY(-0.4rem);
-      background: #DDD;
-      color: black;
-   }
-
-   display: grid;
-   align-items: center;
-
-   grid-template: 
-      "image"
-      "title" 4rem;
-
-   h3 {
-      padding: 1rem 0;
-   }
-
-   img {
-      width: 100%;
-      height: 200px;
-      object-fit: contain;
-   }
 `
 
 

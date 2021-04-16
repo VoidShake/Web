@@ -1,9 +1,8 @@
-import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useMemo, useState } from 'react'
 import Layout from '../../components/Layout'
 import Modlist from '../../components/Modlist'
+import Pages, { LinkPage } from '../../components/Pages'
 import Title from '../../components/Title'
 import database from '../../database'
 import IMod from '../../interfaces/mod'
@@ -12,107 +11,32 @@ import IPack from '../../interfaces/pack'
 const PackView: FC<{
    mods: IMod[]
    name: string
-   pages: Array<{
-      link: string
-      title: string
-   }>
-}> = ({ mods, name, pages }) => {
+   pages: LinkPage[]
+}> = ({ name, ...props }) => {
+
+   const [hoveredMod, setHoveredMod] = useState<IMod>()
+   const [hoveredPage, setHoveredPage] = useState<string>()
+
+   const pages = useMemo(() => props.pages.map(page => ({
+      ...page, highlight: hoveredMod?.pages?.some(p => p.slug === page.slug)
+   })), [props.pages, hoveredMod])
+
+   const mods = useMemo(() => props.mods.map(mod => ({
+      ...mod, highlight: mod.pages?.some(p => p.slug === hoveredPage)
+   })), [props.mods, hoveredPage])
 
    return (
       <Layout title={name}>
 
          <Title>{name}</Title>
 
-         {pages.length > 0 &&
-            <Pages>
-               <p>Read about specific aspects of the pack</p>
-               <ul>
-                  {pages.map(({ link, title }) =>
-                     <Link key={link} href={link}>
-                        <li>
-                           {title}
-                        </li>
-                     </Link>
-                  )}
-               </ul>
-            </Pages>
-         }
+         {pages.length > 0 && <Pages pages={pages} onHover={setHoveredPage} />}
 
-         <Modlist mods={mods} />
+         <Modlist mods={mods} onHover={setHoveredMod} />
 
       </Layout>
    )
 }
-
-const Pages = styled.ul`
-   margin: 3rem 0;
-   text-align: center;
-
-   p {
-      font-style: italic;
-   }
-   
-   ul {
-      display: grid;
-      grid-auto-flow: column;
-      list-style: none;
-      justify-content: center;
-      gap: 2rem;
-      font-size: 2rem;
-      padding: 0.6rem;
-
-      li {
-         padding: 0.4rem 0.8rem;
-         position: relative;
-         transition: all 0.1s linear;
-
-         &:hover {
-            background: #DDD;
-            color: black;
-            cursor: pointer;
-         }
-
-         /*
-         &::after {
-            content: '';
-            background: #FFF2;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
-            transition: clip-path 0.1s linear;
-         }
-
-         &:hover::after {
-            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
-         }
-         */
-
-      }
-   }
-
-   a {
-      text-decoration: none;
-      color: #EEE;
-   }
-`
-
-/*
-export const getStaticPaths: GetStaticPaths = async () => {
-
-  const { db } = await database()
-  const packs: IPack[] = await db.collection('packs').find().toArray()
-
-  const paths = packs.map(({ name }) => ({
-    params: { pack: name }
-  }))
-
-  return { paths, fallback: false }
-}
-*/
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
@@ -128,13 +52,41 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             as: 'pages'
          }
       },
-      { $project: { _id: false } }
+      { $unwind: '$mods' },
+      {
+         $lookup: {
+            from: 'pages',
+            let: {
+               slug: '$mods.slug',
+            },
+            pipeline: [
+               {
+                  $match: {
+                     $expr: {
+                        $in: ['$$slug', '$mods.slug']
+                     }
+                  }
+               },
+               { $project: { _id: false } },
+            ],
+            as: 'mods.pages',
+         }
+      },
+      {
+         $group: {
+            _id: '$_id',
+            mods: { $push: '$mods' },
+            pages: { $first: '$pages' },
+            name: { $first: '$name' },
+            slug: { $first: '$slug' },
+         }
+      }
    ]).toArray()
 
    if (!pack) return { notFound: true }
 
    const pages = pack.pages?.map(({ slug, title }) => ({
-      title,
+      title, slug,
       link: `/${pack.slug}/${slug}`
    })) ?? []
 

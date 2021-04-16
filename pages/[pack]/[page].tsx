@@ -2,26 +2,32 @@ import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
 import { FC, ReactNode, useMemo } from 'react'
 import Layout from '../../components/Layout'
+import ModCard from '../../components/ModCard'
+import { Grid } from '../../components/Modlist'
 import Title from '../../components/Title'
 import database from '../../database'
-import IPage from '../../interfaces/page'
+import IMod from '../../interfaces/mod'
+import IPack from '../../interfaces/pack'
+import IPage, { Relevance } from '../../interfaces/page'
 
-const PackView: FC<IPage> = ({ title, content }) => {
+const Page: FC<IPage<IMod>> = ({ title, content, mods }) => {
 
    return (
       <Layout title={title}>
 
          <Title>{title}</Title>
 
+         <Grid>
+            {mods.map(mod => <ModCard key={mod.slug} {...mod} />)}
+         </Grid>
+
          {content.map(({ text, image }, i) =>
-            <Panel right={i % 2 !== 0}>
-               {text &&
-                  <p>
-                     {text.split('\n').map((line, i) =>
-                        <p key={i}>{line}</p>)
-                     }
-                  </p>
-               }
+            <Panel key={i} right={i % 2 !== 0}>
+               {text && <div>
+                  {text.split('\n').map((line, i) =>
+                     <p key={i}>{line}</p>)
+                  }
+               </div>}
                {image && <img src={image} />}
             </Panel>
          )}
@@ -57,10 +63,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    const { db } = await database()
 
-   const [page] = await db.collection<IPage>('pages').aggregate([
-      {
-         $match: { slug: params?.page.toString(), }
-      },
+   const [{ pack: [pack], ...page }] = await db.collection<IPage & { pack: IPack[] }>('pages').aggregate([
+      { $project: { _id: false } },
+      { $match: { slug: params?.page.toString(), } },
       {
          $lookup: {
             from: 'packs',
@@ -86,15 +91,20 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             }
          }
       },
-      {
-         $project: { _id: false }
-      }
    ]).toArray()
 
-   if (!page) return { notFound: true }
+   if (!page || !pack) return { notFound: true }
 
-   return { props: page }
+   const mods = pack.mods
+      .map(mod => ({ ...mod, ...page.mods.find(m => m.slug === mod.slug) }))
+      .filter(mod => !!mod.relevance)
+      .sort((a, b) => {
+         const [ra, rb] = [a, b].map(x => Object.values(Relevance).indexOf(x.relevance ?? Relevance.MINOR))
+         return ra - rb;
+      })
+
+   return { props: { ...page, mods, pack: pack._id.toString() } }
 
 }
 
-export default PackView
+export default Page

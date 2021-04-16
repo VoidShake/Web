@@ -37,7 +37,7 @@ export function getMod(id: number): Promise<RawMod> {
    return fetch(`${BASE_URL}/addon/${id}`).then(r => r.json())
 }
 
-export async function getMods(pack: RawPack) {
+export async function getMods(pack: RawPack): Promise<IMod[]> {
 
    const addons: Array<Partial<IMod> & { id: number }> = pack.installedAddons
       .filter(a => a.installedFile.modules.some(m => m.foldername === 'META-INF'))
@@ -46,7 +46,7 @@ export async function getMods(pack: RawPack) {
          library: pack.installedAddons.some(a => a.installedFile.dependencies.some(d => d.addonId === addonID))
       }))
 
-   const mods: IMod[] = await Promise.all(addons.map(async a => {
+   return Promise.all(addons.map(async a => {
       const { attachments, primaryCategoryId, categories, ...mod } = await getMod(a.id)
 
       const libIds = [421, 425, 423, 435]
@@ -58,12 +58,4 @@ export async function getMods(pack: RawPack) {
          icon: attachments.find(a => a.isDefault)?.thumbnailUrl
       }
    }))
-
-   const sorted = mods.sort((a, b) => {
-      const [ia, ib] = [a, b].map(x => x.library ? 100000000000 : 0)
-      return (ia - ib) + (b.popularityScore - a.popularityScore)
-   })
-
-   return sorted
-
 }
