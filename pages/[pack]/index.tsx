@@ -5,7 +5,6 @@ import { FC } from 'react'
 import Layout from '../../components/Layout'
 import Modlist from '../../components/Modlist'
 import Title from '../../components/Title'
-import { getMods } from '../../curseforge'
 import database from '../../database'
 import IMod from '../../interfaces/mod'
 import IPack from '../../interfaces/pack'
@@ -129,17 +128,17 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             as: 'pages'
          }
       },
+      { $project: { _id: false } }
    ]).toArray()
 
    if (!pack) return { notFound: true }
-   const mods = await getMods(pack)
 
    const pages = pack.pages?.map(({ slug, title }) => ({
       title,
       link: `/${pack.slug}/${slug}`
    })) ?? []
 
-   return { props: { mods, name: pack.name, pages } }
+   return { props: { ...pack, pages } }
 
 }
 

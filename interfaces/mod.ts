@@ -6,4 +6,10 @@ export default interface IMod {
    summary?: string
    icon?: string
    popularityScore: number
+   categories: Array<{
+      categoryId: number
+      name: string,
+      url: string
+      avatarUrl: string
+   }>
 }

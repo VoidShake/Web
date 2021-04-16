@@ -5,13 +5,18 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
+    "format": "prettier --write **/*.{tsx,ts,scss}",
+    "lint": "eslint --fix **/*.{tsx,ts}",
     "type-check": "tsc"
   },
   "dependencies": {
     "@emotion/babel-plugin": "^11.3.0",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
+    "@types/lodash": "^4.14.168",
     "@types/mongodb": "^3.6.12",
+    "joi": "^17.4.0",
+    "lodash": "^4.17.21",
     "mongodb": "^3.6.6",
     "next": "latest",
     "react": "^17.0.1",
@@ -36,7 +41,7 @@
   },
   "license": "MIT",
   "lint-staged": {
-    "src/**/*.{tsx,ts,scss}": "prettier --write",
-    "src/**/*.{tsx,ts}": "eslint --fix"
+    "**/*.{tsx,ts,scss}": "prettier --write",
+    "**/*.{tsx,ts}": "eslint --fix"
   }
 }

@@ -6,14 +6,14 @@ import Title from '../../components/Title'
 import database from '../../database'
 import IPage from '../../interfaces/page'
 
-const PackView: FC<{ page: IPage }> = ({ page }) => {
+const PackView: FC<IPage> = ({ title, content }) => {
 
    return (
-      <Layout title={page.title}>
+      <Layout title={title}>
 
-         <Title>{page.title}</Title>
+         <Title>{title}</Title>
 
-         {page.content.map(({ text, image }, i) =>
+         {content.map(({ text, image }, i) =>
             <Panel right={i % 2 !== 0}>
                {text &&
                   <p>
@@ -93,7 +93,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    if (!page) return { notFound: true }
 
-   return { props: { page } }
+   return { props: page }
 
 }
 
