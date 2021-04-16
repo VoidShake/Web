@@ -95,13 +95,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    if (!page || !pack) return { notFound: true }
 
-   const mods = pack.mods
-      .map(mod => ({ ...mod, ...page.mods.find(m => m.slug === mod.slug) }))
+   const unsorted = pack.mods
+      .map(mod => ({ ...mod, relevance: undefined, ...page.mods.find(m => m.slug === mod.slug) }))
       .filter(mod => !!mod.relevance)
-      .sort((a, b) => {
-         const [ra, rb] = [a, b].map(x => Object.values(Relevance).indexOf(x.relevance ?? Relevance.MINOR))
-         return ra - rb;
-      })
+
+   const mods = unsorted.sort((a, b) => {
+      const [ra, rb] = [a, b].map(x => Object.values(Relevance).indexOf(x.relevance ?? Relevance.MINOR))
+      return ra - rb;
+   })
 
    return { props: { ...page, mods, pack: pack._id.toString() } }
 

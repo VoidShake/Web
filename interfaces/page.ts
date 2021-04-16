@@ -1,4 +1,4 @@
-interface ModReference {
+export interface ModReference {
    slug: string
    relevance: Relevance
 }

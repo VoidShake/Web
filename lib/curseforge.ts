@@ -11,6 +11,7 @@ interface RawMod {
    primaryCategoryId: number
    categories: IMod['categories']
    name: string
+   slug: string
    popularityScore: number
 }
 
