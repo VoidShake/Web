@@ -1,4 +1,3 @@
-
 import { MongoClient } from 'mongodb'
 
 /**
@@ -10,9 +9,8 @@ let cached = global.mongo
 if (!cached) cached = global.mongo = { conn: undefined, promise: undefined }
 
 export default async function database() {
-
    const { MONGODB_URI, MONGODB_DB } = process.env
-   
+
    if (!MONGODB_URI) throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
    if (!MONGODB_DB) throw new Error('Please define the MONGODB_DB environment variable inside .env.local')
 
@@ -27,7 +25,8 @@ export default async function database() {
       }
 
       cached.promise = MongoClient.connect(MONGODB_URI, opts).then(client => ({
-         client, db: client.db(MONGODB_DB),
+         client,
+         db: client.db(MONGODB_DB),
       }))
    }
 

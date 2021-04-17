@@ -8,55 +8,52 @@ import database from '../database'
 import IPack from '../interfaces/pack'
 
 const Home: FC<{ packs: Partial<IPack>[] }> = ({ packs }) => (
-  <Layout>
-    <Title>Browse packs</Title>
+   <Layout>
+      <Title>Browse packs</Title>
 
-    <List>
-      {packs.map(pack =>
-        <Link key={pack._id} href={`/${pack.slug}`}>
-          <Pack>
-            <img src={pack.assets?.icon} />
-            <h2>{pack.name}</h2>
-          </Pack>
-        </Link>
-      )}
-    </List>
-
-  </Layout>
+      <List>
+         {packs.map(pack => (
+            <Link key={pack._id} href={`/${pack.slug}`}>
+               <Pack>
+                  <img alt={pack.name} src={pack.assets?.icon} />
+                  <h2>{pack.name}</h2>
+               </Pack>
+            </Link>
+         ))}
+      </List>
+   </Layout>
 )
 
 const List = styled.ul`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 300px);
-  justify-content: center;
+   display: grid;
+   grid-template-columns: repeat(auto-fill, 300px);
+   justify-content: center;
 `
 
 const Pack = styled.li`
-  text-align: center;
-  cursor: pointer;
-  padding: 1rem;
+   text-align: center;
+   cursor: pointer;
+   padding: 1rem;
 
-  transition: all 0.1s linear;
-  &:hover {
-    background: #DDD;
-    color: black;
-  }
+   transition: all 0.1s linear;
+   &:hover {
+      background: #ddd;
+      color: black;
+   }
 `
 
 export const getServerSideProps: GetServerSideProps = async () => {
+   const { db } = await database()
+   const rawPacks = await db.collection<IPack>('packs').find().toArray()
 
-  const { db } = await database()
-  const rawPacks = await db.collection<IPack>('packs').find().toArray()
+   const packs = rawPacks.map(pack => ({
+      _id: pack._id.toString(),
+      name: pack.name,
+      slug: pack.slug,
+      assets: pack.assets,
+   }))
 
-  const packs = rawPacks.map(pack => ({
-    _id: pack._id.toString(),
-    name: pack.name,
-    slug: pack.slug,
-    assets: pack.assets
-  }))
-
-  return { props: { packs } }
-
+   return { props: { packs } }
 }
 
 export default Home

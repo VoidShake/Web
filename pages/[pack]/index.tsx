@@ -18,35 +18,42 @@ const PackView: FC<{
    assets: IPack['assets']
    pages: LinkPage[]
 }> = ({ name, assets, description, ...props }) => {
-
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
-   const pages = useMemo(() => props.pages.map(page => ({
-      ...page, highlight: hoveredMod?.pages?.some(p => p.slug === page.slug)
-   })), [props.pages, hoveredMod])
+   const pages = useMemo(
+      () =>
+         props.pages.map(page => ({
+            ...page,
+            highlight: hoveredMod?.pages?.some(p => p.slug === page.slug),
+         })),
+      [props.pages, hoveredMod]
+   )
 
-   const mods = useMemo(() => props.mods.map(mod => ({
-      ...mod, highlight: mod.pages?.some(p => p.slug === hoveredPage)
-   })), [props.mods, hoveredPage])
+   const mods = useMemo(
+      () =>
+         props.mods.map(mod => ({
+            ...mod,
+            highlight: mod.pages?.some(p => p.slug === hoveredPage),
+         })),
+      [props.mods, hoveredPage]
+   )
 
    return (
       <Layout title={name} image={assets.icon} description={description}>
-
          <Background src={assets.background} />
 
-         <Title noline >{name}</Title>
+         <Title noline>{name}</Title>
 
-         {description?.split('\n').map((line, i) =>
+         {description?.split('\n').map((line, i) => (
             <Description key={i}>{line}</Description>
-         )}
+         ))}
 
          {pages.length > 0 && <Pages pages={pages} onHover={setHoveredPage} />}
 
          <Line invisible />
 
          <Modlist mods={mods} onHover={setHoveredMod} />
-
       </Layout>
    )
 }
@@ -58,61 +65,64 @@ const Description = styled.p`
 `
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-
    const { db } = await database()
 
-   const [pack] = await db.collection<IPack>('packs').aggregate([
-      { $match: { slug: params?.pack } },
-      {
-         $lookup: {
-            from: 'pages',
-            localField: '_id',
-            foreignField: 'pack',
-            as: 'pages'
-         }
-      },
-      { $unwind: '$mods' },
-      {
-         $lookup: {
-            from: 'pages',
-            let: {
-               slug: '$mods.slug',
+   const [pack] = await db
+      .collection<IPack>('packs')
+      .aggregate([
+         { $match: { slug: params?.pack } },
+         {
+            $lookup: {
+               from: 'pages',
+               localField: '_id',
+               foreignField: 'pack',
+               as: 'pages',
             },
-            pipeline: [
-               {
-                  $match: {
-                     $expr: {
-                        $in: ['$$slug', '$mods.slug']
-                     }
-                  }
+         },
+         { $unwind: '$mods' },
+         {
+            $lookup: {
+               from: 'pages',
+               let: {
+                  slug: '$mods.slug',
                },
-               { $project: { _id: false } },
-            ],
-            as: 'mods.pages',
-         }
-      },
-      {
-         $group: {
-            _id: '$_id',
-            mods: { $push: '$mods' },
-            pages: { $first: '$pages' },
-            name: { $first: '$name' },
-            description: { $first: '$description' },
-            assets: { $first: '$assets' },
-            slug: { $first: '$slug' },
-         }
-      }
-   ]).toArray()
+               pipeline: [
+                  {
+                     $match: {
+                        $expr: {
+                           $in: ['$$slug', '$mods.slug'],
+                        },
+                     },
+                  },
+                  { $project: { _id: false } },
+               ],
+               as: 'mods.pages',
+            },
+         },
+         {
+            $group: {
+               _id: '$_id',
+               mods: { $push: '$mods' },
+               pages: { $first: '$pages' },
+               name: { $first: '$name' },
+               description: { $first: '$description' },
+               assets: { $first: '$assets' },
+               slug: { $first: '$slug' },
+            },
+         },
+      ])
+      .toArray()
 
    if (!pack) return { notFound: true }
 
-   const pages = pack.pages?.map(({ slug, title }) => ({
-      title, slug,
-      link: `/${pack.slug}/${slug}`
-   })) ?? []
+   const pages =
+      pack.pages?.map(({ slug, title }) => ({
+         title,
+         slug,
+         link: `/${pack.slug}/${slug}`,
+      })) ?? []
 
    return { props: { ...pack, pages } }
-
 }
 
 export default PackView

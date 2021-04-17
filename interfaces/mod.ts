@@ -1,4 +1,4 @@
-import IPage from "./page";
+import IPage from './page'
 
 export default interface IMod {
    id: number
@@ -13,7 +13,7 @@ export default interface IMod {
    fade?: boolean
    categories: Array<{
       categoryId: number
-      name: string,
+      name: string
       url: string
       avatarUrl: string
    }>

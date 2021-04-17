@@ -1,5 +1,5 @@
-import { FC } from "react";
-import HomeLink from "./HomeLink";
+import { FC } from 'react'
+import HomeLink from './HomeLink'
 
 const Navbar: FC = () => (
    <nav>

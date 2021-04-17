@@ -1,5 +1,5 @@
-import IMod from "./mod";
-import IPage from "./page";
+import IMod from './mod'
+import IPage from './page'
 
 export default interface IPack {
    _id: string

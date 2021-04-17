@@ -1,15 +1,15 @@
-import { Db, MongoClient } from "mongodb";
+import { Db, MongoClient } from 'mongodb'
 
 interface DB {
-   client: MongoClient,
-   db: Db,
+   client: MongoClient
+   db: Db
 }
 
 declare global {
    namespace NodeJS {
       interface Global {
          mongo: {
-            conn?: DB,
+            conn?: DB
             promise?: Promise<DB>
          }
       }

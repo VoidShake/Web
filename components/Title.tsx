@@ -1,7 +1,7 @@
-import styled from "@emotion/styled";
-import Link from "next/link";
-import { FC, HTMLAttributes } from "react";
-import Line from "./Line";
+import styled from '@emotion/styled'
+import Link from 'next/link'
+import { FC, HTMLAttributes } from 'react'
+import Line from './Line'
 
 const H1 = styled.h1`
    text-align: center;
@@ -17,7 +17,7 @@ const Crumbs = styled.p`
    a {
       font-size: 1.5rem;
       text-decoration: none;
-      color: #EEE;
+      color: #eee;
    }
 
    &:hover {
@@ -25,24 +25,30 @@ const Crumbs = styled.p`
    }
 `
 
-const Title: FC<HTMLAttributes<HTMLHeadingElement> & {
-   noline?: boolean
-   crumbs?: Array<{
-      name: string
-      link: string
-   }>
-}> = ({ children, crumbs, noline, ...props }) => <>
+const Title: FC<
+   HTMLAttributes<HTMLHeadingElement> & {
+      noline?: boolean
+      crumbs?: Array<{
+         name: string
+         link: string
+      }>
+   }
+> = ({ children, crumbs, noline, ...props }) => (
+   <>
+      {crumbs?.length && (
+         <Crumbs>
+            {crumbs.map(c => (
+               <Link key={c.link} href={c.link}>
+                  {c.name}
+               </Link>
+            ))}
+         </Crumbs>
+      )}
 
-   {crumbs?.length && <Crumbs>{
-      crumbs.map(c => <Link key={c.link} href={c.link}>{c.name}</Link>)
-   }</Crumbs>}
+      <H1 {...props}>{children}</H1>
 
-   <H1 {...props}>
-      {children}
-   </H1>
-
-   <Line invisible={noline} />
-
-</>
+      <Line invisible={noline} />
+   </>
+)
 
 export default Title

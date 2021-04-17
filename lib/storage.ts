@@ -38,5 +38,4 @@ export function sendFile(res: NextApiResponse, ...location: string[]) {
    })
 
    createReadStream(path).pipe(res)
-
 }

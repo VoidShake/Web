@@ -1,9 +1,9 @@
-import { css, Global } from "@emotion/react"
-import styled from "@emotion/styled"
+import { css, Global } from '@emotion/react'
+import styled from '@emotion/styled'
 import { Eye } from '@styled-icons/fa-solid'
-import { FC, ImgHTMLAttributes, useState } from "react"
+import { FC, ImgHTMLAttributes, useState } from 'react'
 
-const Image = styled.img<{ blur: boolean, maximize: boolean }>`
+const Image = styled.img<{ blur: boolean; maximize: boolean }>`
    position: absolute;
    height: 500px;
    object-fit: cover;
@@ -12,9 +12,12 @@ const Image = styled.img<{ blur: boolean, maximize: boolean }>`
    left: 0;
    transition: filter 0.1s linear, height 2s linear;
 
-   ${p => p.maximize || p.blur && css`
-      filter: blur(10px) brightness(0.7);
-   `}
+   ${p =>
+      p.maximize ||
+      (p.blur &&
+         css`
+            filter: blur(10px) brightness(0.7);
+         `)}
 
    @keyframes bounce {
       50% {
@@ -30,13 +33,15 @@ const Image = styled.img<{ blur: boolean, maximize: boolean }>`
       }
    }
 
-   ${p => p.maximize && css`
-      position: fixed;
-      z-index: 999;
+   ${p =>
+      p.maximize &&
+      css`
+         position: fixed;
+         z-index: 999;
 
-      animation: bounce 0.3s linear forwards;
-      cursor: zoom-out;
-   `}
+         animation: bounce 0.3s linear forwards;
+         cursor: zoom-out;
+      `}
 `
 
 const Show = styled.button`
@@ -49,18 +54,24 @@ const Background: FC<ImgHTMLAttributes<HTMLImageElement>> = props => {
    const [blur, setBlur] = useState(true)
    const [maximized, setMaximized] = useState(false)
 
-   return <>
-      <Show title='Maximize background' onMouseOver={() => setBlur(false)} onMouseLeave={() => setBlur(true)} onClick={() => setMaximized(true)}>
-         <Eye size={20} />
-      </Show>
-      <Image maximize={maximized} blur={blur} {...props} onClick={() => setMaximized(false)} title={maximized ? 'Click close' : undefined} />
+   return (
+      <>
+         <Show title='Maximize background' onMouseOver={() => setBlur(false)} onMouseLeave={() => setBlur(true)} onClick={() => setMaximized(true)}>
+            <Eye size={20} />
+         </Show>
+         <Image maximize={maximized} blur={blur} {...props} onClick={() => setMaximized(false)} title={maximized ? 'Click close' : undefined} />
 
-      {maximized && <Global styles={css`
-         body {
-            overflow: hidden;
-         }
-      `} />}
-   </>
+         {maximized && (
+            <Global
+               styles={css`
+                  body {
+                     overflow: hidden;
+                  }
+               `}
+            />
+         )}
+      </>
+   )
 }
 
 export default Background

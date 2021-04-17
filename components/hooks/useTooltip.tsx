@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import ReactTooltip from "react-tooltip"
+import { useEffect, useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 
 export default function useTooltip(id: string) {
    const [mounted, setMounted] = useState(false)
@@ -12,5 +12,4 @@ export default function useTooltip(id: string) {
    const tooltip = <ReactTooltip id={id} backgroundColor='#000' insecure={false} effect='solid' />
 
    return mounted ? tooltip : null
-
 }

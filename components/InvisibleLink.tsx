@@ -1,6 +1,6 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled'
 
 export default styled.a`
    text-decoration: none;
-   color: #EEE;
+   color: #eee;
 `

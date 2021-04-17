@@ -1,7 +1,7 @@
-import styled from '@emotion/styled';
-import Image from 'next/image';
-import Link from 'next/link';
-import React, { FC } from 'react';
+import styled from '@emotion/styled'
+import Image from 'next/image'
+import Link from 'next/link'
+import React, { FC } from 'react'
 
 const Container = styled.div`
    position: relative;
@@ -15,13 +15,13 @@ const Container = styled.div`
       position: absolute;
       z-index: -1;
 
-      background: #EEE;
+      background: #eee;
       border-radius: 999px;
       transition: height 0.05s linear, width 0.05s linear;
 
       height: 0;
       width: 0;
-      
+
       top: 50%;
       left: 50%;
       transform: translate(-60%, -60%);
@@ -31,7 +31,7 @@ const Container = styled.div`
       transition: filter 0.05s linear;
    }
 
-   &:hover{
+   &:hover {
       img {
          filter: invert();
       }
