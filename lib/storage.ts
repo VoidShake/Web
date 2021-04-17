@@ -1,15 +1,19 @@
 import { File } from 'formidable'
 import { createReadStream, existsSync, mkdirSync, renameSync, statSync } from 'fs'
 import { NextApiResponse } from 'next'
-import { dirname, extname, join } from 'path'
+import { extname, join } from 'path'
 
 const STORAGE_PATH = process.env.STORAGE_PATH ?? 'storage'
 
-export function getPath(...location: string[]) {
-   const path = join(STORAGE_PATH, ...location)
-   const dir = dirname(path)
+export function getDir(...location: string[]) {
+   const dir = join(STORAGE_PATH, ...location)
    if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
-   return path
+   return dir
+}
+
+export function getPath(...path: string[]) {
+   const [name, ...dir] = [...path].reverse()
+   return join(getDir(...dir.reverse()), name)
 }
 
 export function exists(...location: string[]) {
