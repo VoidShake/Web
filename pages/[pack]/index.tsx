@@ -12,7 +12,8 @@ const PackView: FC<{
    mods: IMod[]
    name: string
    pages: LinkPage[]
-}> = ({ name, ...props }) => {
+   assets: IPack['assets']
+}> = ({ name, assets, ...props }) => {
 
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
@@ -26,7 +27,7 @@ const PackView: FC<{
    })), [props.mods, hoveredPage])
 
    return (
-      <Layout title={name}>
+      <Layout title={name} image={assets.icon}>
 
          <Title>{name}</Title>
 
@@ -78,6 +79,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             mods: { $push: '$mods' },
             pages: { $first: '$pages' },
             name: { $first: '$name' },
+            assets: { $first: '$assets' },
             slug: { $first: '$slug' },
          }
       }
