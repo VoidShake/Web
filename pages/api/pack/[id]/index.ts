@@ -1,10 +1,13 @@
 import Joi from 'joi'
 import slugify from 'slugify'
-import database from '../../../database'
-import { getMods } from '../../../lib/curseforge'
-import validate from '../../../lib/validate'
+import database from '../../../../database'
+import { getMods } from '../../../../lib/curseforge'
+import validate from '../../../../lib/validate'
 
 const handler = validate({
+   query: {
+      id: Joi.string().required(),
+   },
    body: {
       name: Joi.string().required(),
       installedAddons: Joi.array().required(),

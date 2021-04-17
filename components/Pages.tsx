@@ -36,7 +36,7 @@ const Page = styled.li<{ highlight?: boolean }>`
    ${p => p.highlight && css`
       background: #8a804e;
       outline: 2px solid #eddd93;
-      box-shadow: 0 0 8px 0 #eddd93;
+      //box-shadow: 0 0 8px 0 #eddd93;
    `}
 
    &:hover {
@@ -57,7 +57,6 @@ const List = styled.ul`
    ul {
       display: grid;
       grid-auto-flow: column;
-      list-style: none;
       justify-content: center;
       gap: 2rem;
       font-size: 2rem;

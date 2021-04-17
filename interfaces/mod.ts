@@ -10,6 +10,7 @@ export default interface IMod {
    icon?: string
    popularityScore: number
    highlight?: boolean
+   fade?: boolean
    categories: Array<{
       categoryId: number
       name: string,

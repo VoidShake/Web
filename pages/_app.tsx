@@ -13,11 +13,22 @@ const App: AppComponent = ({ Component, pageProps }) => {
 
    return <>
       <Global styles={css`
+      
          body {
             font-family: sans-serif;
             background: #3e4247;
             color: #EEE;
          }
+
+         ul {
+            list-style: none;
+         }
+
+         img {
+            width: 100%;
+            object-fit: contain;
+         }
+
       `} />
       {mounted && <ReactTooltip backgroundColor='#000' insecure={false} effect='solid' />}
       <Component {...pageProps} />

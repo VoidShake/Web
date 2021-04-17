@@ -11,6 +11,8 @@ const Modlist: FC<{
    onHover?: (mod?: IMod) => void
 }> = ({ mods, ...events }) => {
 
+   const somethingHighlighted = useMemo(() => mods.some(m => m.highlight), [mods])
+
    const libs = useMemo(() => mods.filter(m => m.library).length, [mods])
    const categories = useMemo(() => uniqBy(flatten(mods
       .map(m => m.categories)), c => c.categoryId)
@@ -42,9 +44,10 @@ const Modlist: FC<{
       <Grid>
          {sorted.map(mod => <ModCard
             {...mod}
+            key={mod.id}
             onHover={() => events.onHover?.(mod)}
             onBlur={() => events.onHover?.()}
-            key={mod.id}
+            fade={somethingHighlighted && !mod.highlight}
          />)}
       </Grid>
 
@@ -54,7 +57,6 @@ const Modlist: FC<{
 
 const Categories = styled.ul`
    display: flex;
-   list-style: none;
    flex-wrap: wrap;
    padding: 0.5rem 3rem;
    max-width: 1400px;
@@ -77,7 +79,6 @@ export const Grid = styled.ul`
 
   gap: 1rem;
   padding: 2rem;
-  list-style: none;
 `
 
 

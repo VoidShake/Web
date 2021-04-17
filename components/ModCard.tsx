@@ -4,19 +4,25 @@ import { FC, useMemo } from "react";
 import IMod from "../interfaces/mod";
 import InvisibleLink from "./InvisibleLink";
 
+const Style = {
+   HIGHLIGHTED: { background: '#EEE', text: '#000' },
+   LIBRARY: { background: '#559aed77', text: '#EEE' },
+   MAJOR: { background: '#8a804e', text: '#EEE' },
+}
+
 const ModCard: FC<IMod & {
    onHover?: () => void
    onBlur?: () => void
-}> = ({ websiteUrl, name, icon, library, pages, slug, highlight, ...events }) => {
+}> = ({ websiteUrl, name, icon, library, pages, slug, highlight, fade, ...events }) => {
 
-   const color = useMemo(() => {
-      if(highlight) return '#c7b769';
-      if (library) return '#559aed77'
-      if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return '#8a804e'
+   const style = useMemo(() => {
+      if (highlight) return Style.HIGHLIGHTED;
+      if (library) return Style.LIBRARY;
+      if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return Style.MAJOR;
    }, [library, pages, highlight])
 
    return <InvisibleLink href={websiteUrl}>
-      <Card glow={highlight} color={color} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
+      <Card fade={fade} {...style} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
 
          <img src={icon} />
          <h3>{name}</h3>
@@ -58,18 +64,22 @@ const Lib = styled.span`
    border-radius: 99999px;
 `
 
-const Card = styled.div<{ color?: string, glow?: boolean }>`
+const Card = styled.div<Partial<typeof Style.HIGHLIGHTED> & { glow?: boolean, fade?: boolean }>`
    position: relative;
    text-align: center;
    
-   background: ${p => p.color ?? '#0002'};
+   background: ${p => p.background ?? '#0002'};
+   color: ${p => p.text ?? '#EEE'};
+
+   opacity: ${p => p.fade ? 0.2 : 1};
+
    ${p => p.glow && css`
       outline: 2px solid #eddd93;
       box-shadow: 0 0 5px 0 #eddd93;
    `}
 
    transform: translateY(0);
-   transition: all 0.1s linear;
+   transition: background 0.1s linear, color 0.1s linear, opacity 0.4s linear;
 
    &:hover {
       transform: translateY(-0.4rem);
@@ -89,9 +99,7 @@ const Card = styled.div<{ color?: string, glow?: boolean }>`
    }
 
    img {
-      width: 100%;
       height: 200px;
-      object-fit: contain;
    }
 `
 

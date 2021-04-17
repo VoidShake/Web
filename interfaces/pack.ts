@@ -7,4 +7,5 @@ export default interface IPack {
    slug: string
    mods: IMod[]
    pages?: IPage[]
+   assets: Record<string, string | undefined>
 }
