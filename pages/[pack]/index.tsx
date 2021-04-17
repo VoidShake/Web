@@ -1,6 +1,8 @@
+import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
 import { FC, useMemo, useState } from 'react'
 import Layout from '../../components/Layout'
+import Line from '../../components/Line'
 import Modlist from '../../components/Modlist'
 import Pages, { LinkPage } from '../../components/Pages'
 import Title from '../../components/Title'
@@ -11,9 +13,10 @@ import IPack from '../../interfaces/pack'
 const PackView: FC<{
    mods: IMod[]
    name: string
-   pages: LinkPage[]
+   description?: string
    assets: IPack['assets']
-}> = ({ name, assets, ...props }) => {
+   pages: LinkPage[]
+}> = ({ name, assets, description, ...props }) => {
 
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
@@ -27,17 +30,29 @@ const PackView: FC<{
    })), [props.mods, hoveredPage])
 
    return (
-      <Layout title={name} image={assets.icon}>
+      <Layout title={name} image={assets.icon} description={description}>
 
          <Title>{name}</Title>
 
+         {description?.split('\n').map(line =>
+            <Description>{line}</Description>
+         )}
+
          {pages.length > 0 && <Pages pages={pages} onHover={setHoveredPage} />}
+
+         <Line />
 
          <Modlist mods={mods} onHover={setHoveredMod} />
 
       </Layout>
    )
 }
+
+const Description = styled.p`
+   text-align: center;
+   max-width: 1200px;
+   margin: 0 auto;
+`
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
@@ -79,6 +94,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             mods: { $push: '$mods' },
             pages: { $first: '$pages' },
             name: { $first: '$name' },
+            description: { $first: '$description' },
             assets: { $first: '$assets' },
             slug: { $first: '$slug' },
          }

@@ -18,10 +18,11 @@ const handler = validate({
    const { db } = await database()
 
    if (req.method === 'PUT') {
-      const { name, author } = req.body
+      const { name, author, description, links } = req.body
       const slug = slugify(name, { lower: true })
       const mods = await getMods(req.body)
-      await db.collection('packs').updateOne({ _id: id }, { $set: { name, mods, slug, author } }, { upsert: true })
+      const values = { name, mods, slug, author, description, links }
+      await db.collection('packs').updateOne({ _id: id }, { $set: values }, { upsert: true })
       return res.status(204).end()
    }
 

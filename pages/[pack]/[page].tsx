@@ -10,25 +10,43 @@ import IMod from '../../interfaces/mod'
 import IPack from '../../interfaces/pack'
 import IPage, { Relevance } from '../../interfaces/page'
 
-const Page: FC<IPage<IMod>> = ({ title, content, mods }) => {
+const Page: FC<IPage<IMod> & {
+   pack: {
+      name: string
+      link: string
+   }
+}> = ({ title, content, mods, pack }) => {
+
+   const fewMods = mods.length < 3 && content.length > 0
 
    return (
-      <Layout title={title}>
+      <Layout title={`${pack.name} - ${title}`}>
 
-         <Title>{title}</Title>
-
-         <Grid>
-            {mods.map(mod => <ModCard key={mod.slug} {...mod} />)}
-         </Grid>
+         <Title cumbs={[pack]}>{title}</Title>
+         
+         {!fewMods &&
+            <Grid>
+               {mods.map(mod => <ModCard key={mod.slug} {...mod} />)}
+            </Grid>
+         }
 
          {content.map(({ text, image }, i) =>
             <Panel key={i} right={i % 2 !== 0}>
+
+               {i === 0 && fewMods &&
+                  <Grid>
+                     {mods.map(mod => <ModCard key={mod.slug} {...mod} />)}
+                  </Grid>
+               }
+
                {text && <div>
                   {text.split('\n').map((line, i) =>
                      <p key={i}>{line}</p>)
                   }
                </div>}
+
                {image && <img src={image} />}
+
             </Panel>
          )}
 
@@ -43,12 +61,12 @@ const Panel: FC<{ right?: boolean, children: ReactNode[] }> = ({ right, children
 
 const Split = styled.div<{ right?: boolean }>`
    display: grid;
-   grid-template-columns: repeat(auto-fill, 1fr);
+   grid-auto-flow: column;
    max-width: 1200px;
    margin: 0 auto;
    gap: 3rem;
 
-   p {
+   div {
       p:not(:last-of-type) {
          margin-bottom: 1rem;
       }
@@ -104,7 +122,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       return ra - rb;
    })
 
-   return { props: { ...page, mods, pack: pack._id.toString() } }
+   return {
+      props: {
+         ...page, mods, pack: {
+            name: pack.name,
+            link: `/${pack.slug}`,
+         }
+      }
+   }
 
 }
 

@@ -1,14 +1,13 @@
 import Head from 'next/head';
-import React, { ReactNode } from 'react';
+import React, { FC, ReactNode } from 'react';
 import Navbar from './Navbar';
 
-type Props = {
+const Layout: FC<{
   children?: ReactNode
   title?: string
   image?: string
-}
-
-const Layout = ({ children, title = 'Modpacks', image = '/icon.png' }: Props) => (
+  description?: string
+}> = ({ children, title = 'Modpacks', image = '/icon.png', description }) => (
   <div>
     <Head>
       <title>{title}</title>
@@ -24,6 +23,7 @@ const Layout = ({ children, title = 'Modpacks', image = '/icon.png' }: Props) =>
       <meta property='og:type' content='website' />
       <meta property='og:title' content={title} />
       <meta property='og:image' content={image} />
+      {description && <meta property='og:description' content={description} />}
 
       <link rel='manifest' href='/manifest.json' />
 
