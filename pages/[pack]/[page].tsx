@@ -22,7 +22,7 @@ const Page: FC<IPage<IMod> & {
    return (
       <Layout title={`${pack.name} - ${title}`}>
 
-         <Title cumbs={[pack]}>{title}</Title>
+         <Title>{title}</Title>
          
          {!fewMods &&
             <Grid>
