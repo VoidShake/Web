@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
 import { FC, useMemo, useState } from 'react'
+import Background from '../../components/Background'
 import Layout from '../../components/Layout'
 import Line from '../../components/Line'
 import Modlist from '../../components/Modlist'
@@ -32,7 +33,9 @@ const PackView: FC<{
    return (
       <Layout title={name} image={assets.icon} description={description}>
 
-         <Title>{name}</Title>
+         <Background src={assets.background} />
+
+         <Title noline >{name}</Title>
 
          {description?.split('\n').map((line, i) =>
             <Description key={i}>{line}</Description>
@@ -40,7 +43,7 @@ const PackView: FC<{
 
          {pages.length > 0 && <Pages pages={pages} onHover={setHoveredPage} />}
 
-         <Line />
+         <Line invisible />
 
          <Modlist mods={mods} onHover={setHoveredMod} />
 

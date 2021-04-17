@@ -26,23 +26,23 @@ const Crumbs = styled.p`
 `
 
 const Title: FC<HTMLAttributes<HTMLHeadingElement> & {
+   noline?: boolean
    crumbs?: Array<{
       name: string
       link: string
    }>
-}> = ({ children, crumbs, ...props }) => <>
-      
+}> = ({ children, crumbs, noline, ...props }) => <>
+
    {crumbs?.length && <Crumbs>{
       crumbs.map(c => <Link key={c.link} href={c.link}>{c.name}</Link>)
    }</Crumbs>}
 
    <H1 {...props}>
-
       {children}
-      
    </H1>
 
-   <Line />
+   <Line invisible={noline} />
+
 </>
 
 export default Title
