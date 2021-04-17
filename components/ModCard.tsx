@@ -21,7 +21,8 @@ const ModCard: FC<IMod & {
       if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return Style.MAJOR;
    }, [library, pages, highlight])
 
-   const info = `Referenced in ${pages?.length} ${pages?.length === 1 ? 'page' : 'page'}`
+   const info = `Referenced in ${pages?.length} ${pages?.length === 1 ? 'page' : 'pages'}`
+   const tooltip = `${info} (${pages?.map(p => p.title).join(', ')})`
 
    return <InvisibleLink href={websiteUrl}>
       <Card fade={fade} {...style} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
@@ -30,7 +31,7 @@ const ModCard: FC<IMod & {
          <h3>{name}</h3>
          {library && <Lib>Library</Lib>}
 
-         {pages && pages.length > 0 && <Info title={info} data-tip={info} data-for='mod-info' />}
+         {pages && pages.length > 0 && <Info data-tip={tooltip} data-for='mod-info' />}
 
       </Card>
    </InvisibleLink>

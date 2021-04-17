@@ -23,9 +23,30 @@ const App: AppComponent = ({ Component, pageProps }) => {
             object-fit: contain;
          }
 
+         ${scrollbar}
+
       `} />
       <Component {...pageProps} />
    </>
 }
+
+const scrollbar = css`
+   ::-webkit-scrollbar {
+      width: auto;
+   }
+
+   ::-webkit-scrollbar-track {
+      background: #3e4247;
+   }
+
+   ::-webkit-scrollbar-thumb {
+      background: #333438;
+      border-radius: 6px;
+   }
+
+   ::-webkit-scrollbar-thumb:hover {
+      background: #27292c;
+   }
+`
 
 export default App
