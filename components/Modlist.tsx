@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import { flatten, uniqBy } from 'lodash';
 import { FC, useCallback, useMemo, useState } from "react";
 import IMod from "../interfaces/mod";
+import useTooltip from "./hooks/useTooltip";
 import ModCard from "./ModCard";
 
 const HIDDEN_CATEGORIES = [4780]
@@ -37,8 +38,10 @@ const Modlist: FC<{
    )
 
    const somethingHighlighted = useMemo(() => sorted.some(m => m.highlight), [sorted])
+   const tooltip = useTooltip('mod-info')
 
    return <Container>
+      {tooltip}
       <p>{mods.length - libs} mods ({libs} libraries)</p>
 
       <Categories>

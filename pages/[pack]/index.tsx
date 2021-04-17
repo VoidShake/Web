@@ -34,8 +34,8 @@ const PackView: FC<{
 
          <Title>{name}</Title>
 
-         {description?.split('\n').map(line =>
-            <Description>{line}</Description>
+         {description?.split('\n').map((line, i) =>
+            <Description key={i}>{line}</Description>
          )}
 
          {pages.length > 0 && <Pages pages={pages} onHover={setHoveredPage} />}

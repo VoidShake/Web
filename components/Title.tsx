@@ -9,16 +9,39 @@ const H1 = styled.h1`
    margin: 1rem 0;
 `
 
+const Crumbs = styled.p`
+   margin-bottom: -1rem;
+   padding-top: 0;
+   text-align: center;
+
+   a {
+      font-size: 1.5rem;
+      text-decoration: none;
+      color: #EEE;
+   }
+
+   &:hover {
+      text-decoration: underline;
+   }
+`
+
 const Title: FC<HTMLAttributes<HTMLHeadingElement> & {
    crumbs?: Array<{
       name: string
       link: string
    }>
 }> = ({ children, crumbs, ...props }) => <>
+      
+   {crumbs?.length && <Crumbs>{
+      crumbs.map(c => <Link key={c.link} href={c.link}>{c.name}</Link>)
+   }</Crumbs>}
 
-   {crumbs?.length && <div>{crumbs.map(c => <Link href={c.link}>{c.name}</Link>)}</div>}
+   <H1 {...props}>
 
-   <H1 {...props}>{children}</H1>
+      {children}
+      
+   </H1>
+
    <Line />
 </>
 
