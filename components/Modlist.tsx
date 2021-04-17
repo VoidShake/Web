@@ -1,6 +1,7 @@
+import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { flatten, uniqBy } from 'lodash';
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import IMod from "../interfaces/mod";
 import ModCard from "./ModCard";
 
@@ -11,7 +12,8 @@ const Modlist: FC<{
    onHover?: (mod?: IMod) => void
 }> = ({ mods, ...events }) => {
 
-   const somethingHighlighted = useMemo(() => mods.some(m => m.highlight), [mods])
+   const [hoveredCategory, hoverCategory] = useState<number>()
+   const [selectedCategory, selectCategory] = useState<number>()
 
    const libs = useMemo(() => mods.filter(m => m.library).length, [mods])
    const categories = useMemo(() => uniqBy(flatten(mods
@@ -28,16 +30,27 @@ const Modlist: FC<{
    }, [])
 
    const sorted = useMemo(() => mods
+      .filter(m => !selectedCategory || m.categories.some(c => c.categoryId === selectedCategory))
+      .map(m => ({ ...m, highlight: m.highlight || m.categories.some(c => c.categoryId === hoveredCategory) }))
       .sort((a, b) => rank(b) - rank(a)),
-      [mods]
+      [mods, hoveredCategory, selectedCategory]
    )
+
+   const somethingHighlighted = useMemo(() => sorted.some(m => m.highlight), [sorted])
 
    return <Container>
       <p>{mods.length - libs} mods ({libs} libraries)</p>
 
       <Categories>
          {categories.map(({ categoryId, name }) =>
-            <li key={categoryId}>{name}</li>
+            <Category
+               selected={categoryId === selectedCategory}
+               onMouseOver={() => hoverCategory(categoryId)}
+               onMouseLeave={() => hoverCategory(undefined)}
+               onClick={() => selectedCategory === categoryId ? selectCategory(undefined) : selectCategory(categoryId)}
+               key={categoryId} >
+               {name}
+            </Category>
          )}
       </Categories>
 
@@ -55,6 +68,24 @@ const Modlist: FC<{
 
 }
 
+const Category = styled.li<{ selected?: boolean }>`
+   padding: 0.5rem;
+   margin: 0 0.2rem;
+   cursor: pointer;
+
+   transition: all 0.1s linear, color 0.1s linear;
+
+   ${p => p.selected && css`
+      background: #DDD;
+      color: black;
+   `}
+
+   &:hover {
+      background: #DDD;
+      color: black;
+   }
+`
+
 const Categories = styled.ul`
    display: flex;
    flex-wrap: wrap;
@@ -62,10 +93,6 @@ const Categories = styled.ul`
    max-width: 1400px;
    margin: 0 auto;
    justify-content: center;
-
-   li {
-      padding: 0.5rem;
-   }
 `
 
 const Container = styled.div`
