@@ -105,6 +105,7 @@ const Card = styled.div<Partial<typeof Style.HIGHLIGHTED> & { glow?: boolean; fa
    }
 
    img {
+      background: #0001;
       height: 200px;
    }
 `

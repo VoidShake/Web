@@ -1,5 +1,7 @@
 import styled from '@emotion/styled'
+import { Download } from '@styled-icons/fa-solid'
 import { GetServerSideProps } from 'next'
+import Link from 'next/link'
 import { FC, useMemo, useState } from 'react'
 import Background from '../../components/Background'
 import Layout from '../../components/Layout'
@@ -14,10 +16,12 @@ import IPack from '../../interfaces/pack'
 const PackView: FC<{
    mods: IMod[]
    name: string
+   slug: string
    description?: string
    assets: IPack['assets']
+   links: IPack['links']
    pages: LinkPage[]
-}> = ({ name, assets, description, ...props }) => {
+}> = ({ name, assets, description, slug, links, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
@@ -39,11 +43,19 @@ const PackView: FC<{
       [props.mods, hoveredPage]
    )
 
+   const [download] = Object.entries(links)
+
    return (
       <Layout title={name} image={assets.icon} description={description}>
          <Background src={assets.background} />
 
-         <Title noline>{name}</Title>
+         <Title noline>
+            {name}
+            <Link href={`/${slug}/install/${download[0]}`}>
+               <Links>Download <Download size={20} /></Links>
+            </Link>
+         </Title>
+
 
          {description?.split('\n').map((line, i) => (
             <Description key={i}>{line}</Description>
@@ -57,6 +69,20 @@ const PackView: FC<{
       </Layout>
    )
 }
+
+const Links = styled.h2`
+   font-size: 1.5rem;
+   text-align: center;
+   cursor: pointer;
+
+   &:hover {
+      text-decoration: underline;
+   }
+
+   svg {
+      margin-left: 0.3rem;
+   }
+`
 
 const Description = styled.p`
    text-align: center;
@@ -107,6 +133,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
                name: { $first: '$name' },
                description: { $first: '$description' },
                assets: { $first: '$assets' },
+               links: { $first: '$links' },
                slug: { $first: '$slug' },
             },
          },

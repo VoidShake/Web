@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
+import ReactTooltip, { TooltipProps } from 'react-tooltip'
 
-export default function useTooltip(id: string) {
+export default function useTooltip(id: string, props: TooltipProps = {}) {
    const [mounted, setMounted] = useState(false)
 
    useEffect(() => {
@@ -9,7 +9,7 @@ export default function useTooltip(id: string) {
       return () => setMounted(false)
    })
 
-   const tooltip = <ReactTooltip id={id} backgroundColor='#000' insecure={false} effect='solid' />
+   const tooltip = <ReactTooltip id={id} backgroundColor='#000' insecure={false} effect='solid' {...props} />
 
    return mounted ? tooltip : null
 }

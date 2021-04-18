@@ -1,7 +1,9 @@
-import styled from '@emotion/styled'
-import Link from 'next/link'
-import { FC, HTMLAttributes } from 'react'
-import Line from './Line'
+import { jsx } from '@emotion/react';
+import styled from '@emotion/styled';
+import { StyledIcon } from '@styled-icons/styled-icon';
+import Link from 'next/link';
+import { FC, HTMLAttributes } from 'react';
+import Line from './Line';
 
 const H1 = styled.h1`
    text-align: center;
@@ -9,7 +11,7 @@ const H1 = styled.h1`
    margin: 1rem 0;
 `
 
-const Crumbs = styled.p`
+const Subtitle = styled.p`
    margin-bottom: -1rem;
    padding-top: 0;
    text-align: center;
@@ -27,25 +29,27 @@ const Crumbs = styled.p`
 
 const Title: FC<
    HTMLAttributes<HTMLHeadingElement> & {
+      icon?: StyledIcon
       noline?: boolean
-      crumbs?: Array<{
+      subtitle?: {
          name: string
          link: string
-      }>
+      }
    }
-> = ({ children, crumbs, noline, ...props }) => (
+> = ({ children, subtitle, noline, icon, ...props }) => (
    <>
-      {crumbs?.length && (
-         <Crumbs>
-            {crumbs.map(c => (
-               <Link key={c.link} href={c.link}>
-                  {c.name}
-               </Link>
-            ))}
-         </Crumbs>
+      {subtitle && (
+         <Subtitle>
+            <Link href={subtitle.link}>
+               {subtitle.name}
+            </Link>
+         </Subtitle>
       )}
 
-      <H1 {...props}>{children}</H1>
+      <H1 {...props}>
+         {children}
+         {icon && jsx(icon, { size: 40 })}
+      </H1>
 
       <Line invisible={noline} />
    </>

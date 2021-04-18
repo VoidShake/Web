@@ -22,7 +22,7 @@ const Page: FC<
 
    return (
       <Layout title={`${pack.name} - ${title}`}>
-         <Title crumbs={[pack]}>{title}</Title>
+         <Title subtitle={pack}>{title}</Title>
 
          {!fewMods && (
             <Grid>
@@ -83,12 +83,7 @@ const Split = styled.div<{ right?: boolean }>`
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    const { db } = await database()
 
-   const [
-      {
-         pack: [pack],
-         ...page
-      },
-   ] = await db
+   const [result] = await db
       .collection<IPage & { pack: IPack[] }>('pages')
       .aggregate([
          { $project: { _id: false } },
@@ -122,7 +117,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       ])
       .toArray()
 
-   if (!page || !pack) return { notFound: true }
+   if (!result) return { notFound: true }
+
+   const { pack: [pack], ...page } = result
+
+   if (!pack) return { notFound: true }
 
    const unsorted = pack.mods.map(mod => ({ ...mod, relevance: undefined, ...page.mods.find(m => m.slug === mod.slug) })).filter(mod => !!mod.relevance)
 
