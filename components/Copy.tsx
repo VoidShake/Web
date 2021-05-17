@@ -39,7 +39,6 @@ const Copy: FC<{
 
    const click = useCallback(() => {
       navigator.clipboard.writeText(copyText)
-      console.log(copyText)
       setJustCopied(true)
    }, [copyText])
 

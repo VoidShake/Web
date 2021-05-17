@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Download } from '@styled-icons/fa-solid'
+import { Clock, Download } from '@styled-icons/fa-solid'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { FC, useMemo, useState } from 'react'
@@ -21,7 +21,8 @@ const PackView: FC<{
    assets: IPack['assets']
    links: IPack['links']
    pages: LinkPage[]
-}> = ({ name, assets, description, slug, links, ...props }) => {
+   version?: string
+}> = ({ name, assets, description, slug, links, version, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
@@ -51,11 +52,17 @@ const PackView: FC<{
 
          <Title noline>
             {name}
-            <Link href={`/${slug}/install/${download[0]}`}>
-               <Links>Download <Download size={20} /></Links>
-            </Link>
-         </Title>
 
+            <Subtitle>
+               <Link href={`/${slug}/install/${download[0]}`}>
+                  <Links> Download <Download size={20} /></Links>
+               </Link>
+
+               <Link href={`/${slug}/changelog`}>
+                  <Links> Changelog <Clock size={20} /></Links>
+               </Link>
+            </Subtitle>
+         </Title>
 
          {description?.split('\n').map((line, i) => (
             <Description key={i}>{line}</Description>
@@ -70,9 +77,16 @@ const PackView: FC<{
    )
 }
 
-const Links = styled.h2`
-   font-size: 1.5rem;
+const Subtitle = styled.h2`
+   margin-top: 0.5rem;
+   font-size: 1.2rem;
    text-align: center;
+   display: grid;
+   grid-auto-flow: column;
+   justify-content: space-around;
+`
+
+const Links = styled.span`
    cursor: pointer;
 
    &:hover {
@@ -135,12 +149,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
                assets: { $first: '$assets' },
                links: { $first: '$links' },
                slug: { $first: '$slug' },
+               releases: { $first: '$releases' }
             },
          },
       ])
       .toArray()
 
    if (!pack) return { notFound: true }
+
+   const version = pack.releases?.[0]?.version
+   delete pack.releases
 
    const pages =
       pack.pages?.map(({ slug, title }) => ({
@@ -149,7 +167,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
          link: `/${pack.slug}/${slug}`,
       })) ?? []
 
-   return { props: { ...pack, pages } }
+   return { props: { ...pack, pages, version } }
 }
 
 export default PackView

@@ -8,7 +8,8 @@ import Line from './Line';
 const H1 = styled.h1`
    text-align: center;
    font-size: 4rem;
-   margin: 1rem 0;
+   margin: 1rem auto;
+   width: fit-content;
 `
 
 const Subtitle = styled.p`

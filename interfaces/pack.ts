@@ -1,5 +1,6 @@
 import IMod from './mod'
 import IPage from './page'
+import IRelease from './release'
 
 export default interface IPack {
    _id: string
@@ -10,4 +11,5 @@ export default interface IPack {
    pages?: IPage[]
    assets: Record<string, string | undefined>
    links: Record<string, string | undefined>
+   releases?: IRelease[]
 }
