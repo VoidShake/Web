@@ -1,5 +1,6 @@
 import Joi, { ValidationOptions } from 'joi'
 import { NextApiHandler, NextApiRequest } from 'next'
+import wrapper, { AuthenticatedApiHandler } from './wrapper'
 
 type Schema = Record<string, Joi.Schema>
 
@@ -9,8 +10,8 @@ export default function validate(
       headers?: Schema
       query?: Schema
    },
-   handlerOrOptions: NextApiHandler | ValidationOptions,
-   handler?: NextApiHandler
+   handlerOrOptions: AuthenticatedApiHandler | ValidationOptions,
+   handler?: AuthenticatedApiHandler
 ): NextApiHandler {
    const h = typeof handlerOrOptions === 'function' ? handlerOrOptions : handler
    const o = typeof handlerOrOptions === 'function' ? {} : handlerOrOptions
@@ -25,7 +26,7 @@ export default function validate(
       .map(([key, blueprint]) => ({ schema: Joi.object(blueprint), key: key as keyof NextApiRequest }))
       .map(({ key, schema }) => (req: NextApiRequest) => schema.validate(req[key], options))
 
-   return (req, res) => {
+   return wrapper((req, res) => {
       const results = predicates.map(p => p(req))
       const error = results.map(r => r.error).find(e => !!e)
 
@@ -36,5 +37,5 @@ export default function validate(
       } else {
          return h(req, res)
       }
-   }
+   })
 }

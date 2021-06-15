@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { DateTime } from "luxon";
 import { FC, useMemo } from "react";
-import IRelease from "../interfaces/release";
+import { IRelease } from "../database/models/Release";
 import InvisibleLink from "./InvisibleLink";
 
 const Release: FC<IRelease> = ({ version, name, changelog, date, url, children }) => {

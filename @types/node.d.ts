@@ -1,4 +1,4 @@
-import { Db, MongoClient } from 'mongodb'
+import mongoose from 'mongoose';
 
 interface DB {
    client: MongoClient
@@ -9,8 +9,8 @@ declare global {
    namespace NodeJS {
       interface Global {
          mongo: {
-            conn?: DB
-            promise?: Promise<DB>
+            conn?: typeof mongoose
+            promise?: Promise<typeof mongoose>
          }
       }
    }

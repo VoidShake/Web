@@ -6,11 +6,11 @@ import ModCard from '../../components/ModCard'
 import { Grid } from '../../components/Modlist'
 import Title from '../../components/Title'
 import database from '../../database'
-import IMod from '../../interfaces/mod'
-import IPack from '../../interfaces/pack'
-import IPage, { Relevance } from '../../interfaces/page'
+import { IMod } from '../../database/models/Mod'
+import { IPack } from '../../database/models/Pack'
+import Page, { IPage, Relevance } from '../../database/models/Page'
 
-const Page: FC<
+const DocuPage: FC<
    IPage<IMod> & {
       pack: {
          name: string
@@ -81,41 +81,38 @@ const Split = styled.div<{ right?: boolean }>`
 `
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-   const { db } = await database()
+   await database()
 
-   const [result] = await db
-      .collection<IPage & { pack: IPack[] }>('pages')
-      .aggregate([
-         { $project: { _id: false } },
-         { $match: { slug: params?.page.toString() } },
-         {
-            $lookup: {
-               from: 'packs',
-               localField: 'pack',
-               foreignField: '_id',
-               as: 'pack',
-            },
+   const [result] = await Page.aggregate<IPage & { pack: IPack[] }>([
+      { $project: { _id: false } },
+      { $match: { slug: params?.page.toString() } },
+      {
+         $lookup: {
+            from: 'packs',
+            localField: 'pack',
+            foreignField: '_id',
+            as: 'pack',
          },
-         {
-            $addFields: {
-               Pack: {
-                  $arrayElemAt: [
-                     {
-                        $filter: {
-                           input: '$Pack',
-                           as: 'pack',
-                           cond: {
-                              $eq: ['$$pack.slug', params?.pack],
-                           },
+      },
+      {
+         $addFields: {
+            Pack: {
+               $arrayElemAt: [
+                  {
+                     $filter: {
+                        input: '$Pack',
+                        as: 'pack',
+                        cond: {
+                           $eq: ['$$pack.slug', params?.pack],
                         },
                      },
-                     0,
-                  ],
-               },
+                  },
+                  0,
+               ],
             },
          },
-      ])
-      .toArray()
+      },
+   ])
 
    if (!result) return { notFound: true }
 
@@ -142,4 +139,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    }
 }
 
-export default Page
+export default DocuPage

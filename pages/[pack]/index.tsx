@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { Clock, Download } from '@styled-icons/fa-solid'
+import { Document } from 'mongoose'
 import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { FC, useMemo, useState } from 'react'
@@ -9,9 +10,9 @@ import Line from '../../components/Line'
 import Modlist from '../../components/Modlist'
 import Pages, { LinkPage } from '../../components/Pages'
 import Title from '../../components/Title'
-import database from '../../database'
-import IMod from '../../interfaces/mod'
-import IPack from '../../interfaces/pack'
+import database, { serialize } from '../../database'
+import { IMod } from '../../database/models/Mod'
+import Pack, { IPack } from '../../database/models/Pack'
 
 const PackView: FC<{
    mods: IMod[]
@@ -22,7 +23,7 @@ const PackView: FC<{
    links: IPack['links']
    pages: LinkPage[]
    version?: string
-}> = ({ name, assets, description, slug, links, version, ...props }) => {
+}> = ({ name, assets, description, slug, links, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
@@ -105,55 +106,52 @@ const Description = styled.p`
 `
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-   const { db } = await database()
+   await database()
 
-   const [pack] = await db
-      .collection<IPack>('packs')
-      .aggregate([
-         { $match: { slug: params?.pack } },
-         {
-            $lookup: {
-               from: 'pages',
-               localField: '_id',
-               foreignField: 'pack',
-               as: 'pages',
-            },
+   const [pack] = await Pack.aggregate<IPack & Document>([
+      { $match: { slug: params?.pack } },
+      {
+         $lookup: {
+            from: 'pages',
+            localField: '_id',
+            foreignField: 'pack',
+            as: 'pages',
          },
-         { $unwind: '$mods' },
-         {
-            $lookup: {
-               from: 'pages',
-               let: {
-                  slug: '$mods.slug',
-               },
-               pipeline: [
-                  {
-                     $match: {
-                        $expr: {
-                           $in: ['$$slug', '$mods.slug'],
-                        },
+      },
+      { $unwind: '$mods' },
+      {
+         $lookup: {
+            from: 'pages',
+            let: {
+               slug: '$mods.slug',
+            },
+            pipeline: [
+               {
+                  $match: {
+                     $expr: {
+                        $in: ['$$slug', '$mods.slug'],
                      },
                   },
-                  { $project: { _id: false } },
-               ],
-               as: 'mods.pages',
-            },
+               },
+               { $project: { _id: false } },
+            ],
+            as: 'mods.pages',
          },
-         {
-            $group: {
-               _id: '$_id',
-               mods: { $push: '$mods' },
-               pages: { $first: '$pages' },
-               name: { $first: '$name' },
-               description: { $first: '$description' },
-               assets: { $first: '$assets' },
-               links: { $first: '$links' },
-               slug: { $first: '$slug' },
-               releases: { $first: '$releases' }
-            },
+      },
+      {
+         $group: {
+            _id: '$_id',
+            mods: { $push: '$mods' },
+            pages: { $first: '$pages' },
+            name: { $first: '$name' },
+            description: { $first: '$description' },
+            assets: { $first: '$assets' },
+            links: { $first: '$links' },
+            slug: { $first: '$slug' },
+            releases: { $first: '$releases' }
          },
-      ])
-      .toArray()
+      },
+   ])
 
    if (!pack) return { notFound: true }
 
@@ -167,7 +165,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
          link: `/${pack.slug}/${slug}`,
       })) ?? []
 
-   return { props: { ...pack, pages, version } }
+   return { props: { ...serialize(pack), pages, version } }
 }
 
 export default PackView

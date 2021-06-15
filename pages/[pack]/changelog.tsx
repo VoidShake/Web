@@ -8,7 +8,7 @@ import Release from '../../components/Release'
 import Timeline, { TimelineDot } from '../../components/Timeline'
 import Title from '../../components/Title'
 import database from '../../database'
-import IPack from '../../interfaces/pack'
+import Pack, { IPack } from '../../database/models/Pack'
 
 const PackView: FC<{
    name: string
@@ -53,24 +53,21 @@ const Releases = styled.ul`
 `
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-   const { db } = await database()
+   await database()
 
-   const [pack] = await db
-      .collection<IPack>('packs')
-      .aggregate([
-         { $match: { slug: params?.pack } },
-         {
-            $group: {
-               _id: '$_id',
-               name: { $first: '$name' },
-               assets: { $first: '$assets' },
-               links: { $first: '$links' },
-               slug: { $first: '$slug' },
-               releases: { $first: '$releases' },
-            },
+   const [pack] = await Pack.aggregate<IPack>([
+      { $match: { slug: params?.pack } },
+      {
+         $group: {
+            _id: '$_id',
+            name: { $first: '$name' },
+            assets: { $first: '$assets' },
+            links: { $first: '$links' },
+            slug: { $first: '$slug' },
+            releases: { $first: '$releases' },
          },
-      ])
-      .toArray()
+      },
+   ])
 
    if (!pack) return { notFound: true }
 

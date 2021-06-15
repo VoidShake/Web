@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { parse } from 'path'
-import database from '../../../../../database'
+import Pack from '../../../../../database/models/Pack'
 import parseFiles from '../../../../../lib/requestFiles'
 import { save } from '../../../../../lib/storage'
 import validate from '../../../../../lib/validate'
@@ -14,8 +14,6 @@ const handler = validate(
    async (req, res) => {
       const { id } = req.query
 
-      const { db } = await database()
-
       if (req.method === 'PUT') {
          const files = await parseFiles(req)
 
@@ -26,7 +24,7 @@ const handler = validate(
             return { ...o, [name]: `/api/pack/${id}/assets/${path}` }
          }, {})
 
-         await db.collection('packs').updateOne({ _id: id }, { $set: { assets } }, { upsert: true })
+         await Pack.findByIdAndUpdate(id, assets, { upsert: true })
          return res.status(200).json({ assets })
       }
 

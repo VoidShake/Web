@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import slugify from 'slugify'
-import database from '../../../../database'
+import Pack from '../../../../database/models/Pack'
 import { getMods } from '../../../../lib/curseforge'
 import validate from '../../../../lib/validate'
 
@@ -17,8 +17,6 @@ const handler = validate(
    async (req, res) => {
       const { id } = req.query
 
-      const { db } = await database()
-
       if (req.method === 'PUT') {
 
          const { name, author, description, links, releases } = req.body
@@ -27,10 +25,11 @@ const handler = validate(
 
          const values = { name, mods, slug, author, description, links, releases }
 
-         await db.collection('packs').updateOne({ _id: id }, {
+         await Pack.findByIdAndUpdate(id, {
             $set: values,
             //$push: { releases: { release } }
          }, { upsert: true })
+         
          return res.status(204).end()
       }
 
