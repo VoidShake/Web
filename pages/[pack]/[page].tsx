@@ -5,10 +5,11 @@ import Layout from '../../components/Layout'
 import ModCard from '../../components/ModCard'
 import { Grid } from '../../components/Modlist'
 import Title from '../../components/Title'
-import database from '../../database'
+import database, { serialize } from '../../database'
 import { IMod } from '../../database/models/Mod'
 import { IPack } from '../../database/models/Pack'
 import Page, { IPage, Relevance } from '../../database/models/Page'
+import Release from '../../database/models/Release'
 
 const DocuPage: FC<
    IPage<IMod> & {
@@ -17,7 +18,7 @@ const DocuPage: FC<
          link: string
       }
    }
-> = ({ title, content, mods, pack }) => {
+> = ({ title, content = [], mods, pack }) => {
    const fewMods = mods.length < 3 && content.length > 0
 
    return (
@@ -83,8 +84,7 @@ const Split = styled.div<{ right?: boolean }>`
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    await database()
 
-   const [result] = await Page.aggregate<IPage & { pack: IPack[] }>([
-      { $project: { _id: false } },
+   const [result] = await Page.aggregate<IPage & { pack: IPack }>([
       { $match: { slug: params?.page.toString() } },
       {
          $lookup: {
@@ -96,11 +96,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       },
       {
          $addFields: {
-            Pack: {
+            pack: {
                $arrayElemAt: [
                   {
                      $filter: {
-                        input: '$Pack',
+                        input: '$pack',
                         as: 'pack',
                         cond: {
                            $eq: ['$$pack.slug', params?.pack],
@@ -116,11 +116,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    if (!result) return { notFound: true }
 
-   const { pack: [pack], ...page } = result
+   const { pack, ...page } = result
 
    if (!pack) return { notFound: true }
+   const release = await Release.findOne({ pack: pack.id })
 
-   const unsorted = pack.mods.map(mod => ({ ...mod, relevance: undefined, ...page.mods.find(m => m.slug === mod.slug) })).filter(mod => !!mod.relevance)
+   const unsorted = (release?.mods ?? [])
+      .map(mod => ({ ...mod, relevance: undefined, ...page.mods.find(m => m.slug === mod.slug) }))
+      .filter(mod => !!mod.relevance)
 
    const mods = unsorted.sort((a, b) => {
       const [ra, rb] = [a, b].map(x => Object.values(Relevance).indexOf(x.relevance ?? Relevance.MINOR))
@@ -129,8 +132,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    return {
       props: {
-         ...page,
-         mods,
+         ...serialize(page),
+         mods: serialize(mods),
          pack: {
             name: pack.name,
             link: `/${pack.slug}`,

@@ -45,17 +45,19 @@ export function define<M>(name: string, schema: Schema<Document & M>): Model<M> 
 }
 
 export const serialize: {
-   <M>(model?: (Document & M) | null): M | undefined
-   <M>(model: Array<Document & M>): M[]
+   <M>(model?: (M) | null): M
+   <M>(model: Array<M>): M[]
 } = <M>(model?: Document | Document[]) => {
 
    if (model === null || model === undefined) return null
    if (Array.isArray(model)) return model.map(m => serialize(m)) as any as M[]
 
    if (typeof model === 'object' && '_id' in model) {
+
       const props = Object.entries(model instanceof Document ? model.toObject({ virtuals: true }) : model)
          .reduce((o, [key, value]) => ({ ...o, [key]: serialize(value) }), {})
-      return { ...props, id: model._id?.toString() } as any as M
+      const id = model._id?.toString()
+      return { ...props, id, _id: id } as any as M
 
    }
 

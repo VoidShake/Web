@@ -18,7 +18,10 @@ export interface IMod {
       url: string
       avatarUrl: string
    }>
-   date: string
+   version: {
+      date: string
+      file: string
+   }
    pages?: Array<IPage>
 }
 
@@ -48,7 +51,11 @@ const schema = new Schema({
       name: { type: String, required: true },
       url: { type: String, required: true },
       avatarUrl: { type: String, required: true },
-   })]
+   })],
+   version: new Schema({
+      date: { type: String, required: true },
+      file: { type: String, required: true },
+   })
 })
 
 export default schema

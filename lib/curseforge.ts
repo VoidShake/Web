@@ -16,8 +16,6 @@ interface RawMod {
 }
 
 interface RawPack {
-   name: string
-   slug: string
    installedAddons: {
       addonID: number
       installedFile: {
@@ -43,7 +41,10 @@ export async function getMods(pack: RawPack): Promise<IMod[]> {
       .filter(a => a.installedFile.modules.some(m => m.foldername === 'META-INF'))
       .map(({ addonID, installedFile }) => ({
          cfID: addonID,
-         date: installedFile.fileDate,
+         version: {
+            date: installedFile.fileDate,
+            file: installedFile.displayName,
+         },
          library: pack.installedAddons.some(a => a.installedFile.dependencies.some(d => d.addonId === addonID)),
       }))
 

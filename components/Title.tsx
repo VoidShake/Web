@@ -1,9 +1,9 @@
 import { jsx } from '@emotion/react';
 import styled from '@emotion/styled';
 import { StyledIcon } from '@styled-icons/styled-icon';
-import Link from 'next/link';
 import { FC, HTMLAttributes } from 'react';
 import Line from './Line';
+import Link from './Link';
 
 const H1 = styled.h1`
    text-align: center;

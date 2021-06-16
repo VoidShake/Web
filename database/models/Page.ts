@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import Mongoose, { Schema } from "mongoose";
 import { define } from "..";
 import Model from "./Base";
 
@@ -25,7 +25,7 @@ export interface IPage<M = ModReference> extends Model {
 
 const schema = new Schema({
    pack: {
-      type: String,
+      type: Mongoose.Types.ObjectId,
       required: true,
    },
    slug: String,

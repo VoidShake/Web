@@ -19,11 +19,11 @@ const handler = validate(
 
       if (req.method === 'PUT') {
 
-         const { name, author, description, links, releases } = req.body
+         const { name, author, description, links } = req.body
          const slug = slugify(name, { lower: true })
          const mods = await getMods(req.body)
 
-         const values = { name, mods, slug, author, description, links, releases }
+         const values = { name, mods, slug, author, description, links }
 
          await Pack.findByIdAndUpdate(id, {
             $set: values,

@@ -6,7 +6,7 @@ import Copy from '../../../components/Copy'
 import Layout from '../../../components/Layout'
 import LinkButton from '../../../components/LinkButton'
 import Title from '../../../components/Title'
-import database from '../../../database'
+import database, { serialize } from '../../../database'
 import Pack, { IPack } from '../../../database/models/Pack'
 
 const PackView: FC<IPack> = ({ name, assets, description, links, slug }) => {
@@ -158,7 +158,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    if (!pack) return { notFound: true }
 
-   return { props: pack }
+   return { props: serialize(pack) }
 }
 
 export default PackView

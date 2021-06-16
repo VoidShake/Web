@@ -19,7 +19,6 @@
     "@types/lodash": "^4.14.168",
     "@types/luxon": "^1.26.5",
     "@types/mongodb": "^3.6.12",
-    "@types/styled-components": "^5.1.10",
     "cuid": "^2.1.8",
     "formidable": "^1.2.2",
     "joi": "^17.4.0",

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import Image from 'next/image'
-import Link from 'next/link'
 import React, { FC } from 'react'
+import Link from './Link'
 
 const Container = styled.div`
    position: relative;

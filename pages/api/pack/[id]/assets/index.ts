@@ -14,6 +14,7 @@ const handler = validate(
    async (req, res) => {
       const { id } = req.query
 
+
       if (req.method === 'PUT') {
          const files = await parseFiles(req)
 
@@ -24,7 +25,7 @@ const handler = validate(
             return { ...o, [name]: `/api/pack/${id}/assets/${path}` }
          }, {})
 
-         await Pack.findByIdAndUpdate(id, assets, { upsert: true })
+         await Pack.findByIdAndUpdate(id, { assets }, { upsert: true })
          return res.status(200).json({ assets })
       }
 

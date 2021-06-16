@@ -4,12 +4,14 @@ import wrapper, { AuthenticatedApiHandler } from './wrapper'
 
 type Schema = Record<string, Joi.Schema>
 
+type SchemaKey = 'body' | 'headers' | 'query'
+
+type RequestSchema = {
+   [K in SchemaKey]?: Schema
+}
+
 export default function validate(
-   schema: {
-      body?: Schema
-      headers?: Schema
-      query?: Schema
-   },
+   schema: RequestSchema,
    handlerOrOptions: AuthenticatedApiHandler | ValidationOptions,
    handler?: AuthenticatedApiHandler
 ): NextApiHandler {
@@ -18,7 +20,7 @@ export default function validate(
    if (!h) throw new Error('NextApiHandler missing')
 
    const options: ValidationOptions = {
-      allowUnknown: true,
+      stripUnknown: true,
       ...o,
    }
 
@@ -35,6 +37,11 @@ export default function validate(
             error: error.message,
          })
       } else {
+
+         Object.keys(schema).map(k => k as SchemaKey).forEach((key, i) => {
+            req[key] = results[i].value
+         })
+
          return h(req, res)
       }
    })
