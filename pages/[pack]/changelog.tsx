@@ -7,14 +7,15 @@ import Layout from '../../components/Layout'
 import Release from '../../components/Release'
 import Timeline, { TimelineDot } from '../../components/Timeline'
 import Title from '../../components/Title'
-import database from '../../database'
-import IPack from '../../interfaces/pack'
+import database, { serialize } from '../../database'
+import Pack, { IPack } from '../../database/models/Pack'
+import { IRelease } from '../../database/models/Release'
 
 const PackView: FC<{
    name: string
    slug: string
    assets: IPack['assets']
-   releases: IPack['releases']
+   releases: IRelease[]
 }> = ({ name, assets, releases, slug }) => {
 
    const tooltip = useTooltip('release')
@@ -53,28 +54,35 @@ const Releases = styled.ul`
 `
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-   const { db } = await database()
+   await database()
 
-   const [pack] = await db
-      .collection<IPack>('packs')
-      .aggregate([
-         { $match: { slug: params?.pack } },
-         {
-            $group: {
-               _id: '$_id',
-               name: { $first: '$name' },
-               assets: { $first: '$assets' },
-               links: { $first: '$links' },
-               slug: { $first: '$slug' },
-               releases: { $first: '$releases' },
-            },
+   const [pack] = await Pack.aggregate<IPack>([
+      { $match: { slug: params?.pack } },
+      {
+         $lookup: {
+            from: 'releases',
+            localField: '_id',
+            foreignField: 'pack',
+            as: 'releases',
          },
-      ])
-      .toArray()
+      },
+      { $unwind: { path: '$releases', preserveNullAndEmptyArrays: true } },
+      { $sort: { 'releases.date': -1 } },
+      {
+         $group: {
+            _id: '$_id',
+            name: { $first: '$name' },
+            assets: { $first: '$assets' },
+            links: { $first: '$links' },
+            slug: { $first: '$slug' },
+            releases: { $push: '$releases' },
+         },
+      },
+   ])
 
    if (!pack) return { notFound: true }
 
-   return { props: pack }
+   return { props: serialize(pack) }
 }
 
 export default PackView

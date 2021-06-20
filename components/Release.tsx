@@ -1,15 +1,17 @@
 import styled from "@emotion/styled";
 import { DateTime } from "luxon";
+import { useRouter } from 'next/router';
 import { FC, useMemo } from "react";
-import IRelease from "../interfaces/release";
-import InvisibleLink from "./InvisibleLink";
+import Link from '../components/Link';
+import { IRelease } from "../database/models/Release";
 
-const Release: FC<IRelease> = ({ version, name, changelog, date, url, children }) => {
+const Release: FC<IRelease> = ({ version, name, changelog, date, children }) => {
 
    const time = useMemo(() => DateTime.fromISO(date), [date])
+   const { query } = useRouter()
 
    return (
-      <InvisibleLink href={url} target='_blank' rel="noopener">
+      <Link href={`/${query.pack}?version=${version}`}>
          <Container>
             <h2>{name ?? `Version ${version}`}</h2>
             <Time data-tip={time.toLocaleString()} data-for={'release'}>{time.toRelative()}</Time>
@@ -20,7 +22,7 @@ const Release: FC<IRelease> = ({ version, name, changelog, date, url, children }
             </Changelog>
             {children}
          </Container>
-      </InvisibleLink>
+      </Link>
    )
 }
 

@@ -1,7 +1,7 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
 import { FC, useMemo } from 'react'
-import IMod from '../interfaces/mod'
+import { IMod } from '../database/models/Mod'
 import InvisibleLink from './InvisibleLink'
 
 const Style = {

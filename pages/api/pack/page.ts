@@ -1,7 +1,6 @@
 import Joi from 'joi'
 import slugify from 'slugify'
-import database from '../../../database'
-import { Relevance } from '../../../interfaces/page'
+import Page, { Relevance } from '../../../database/models/Page'
 import validate from '../../../lib/validate'
 
 const handler = validate(
@@ -29,7 +28,6 @@ const handler = validate(
       },
    },
    async (req, res) => {
-      const { db } = await database()
 
       if (req.method === 'PUT') {
          const slug = slugify(req.body.title, { lower: true })
@@ -37,7 +35,8 @@ const handler = validate(
 
          const mods = req.body.mods.map((m: unknown) => (typeof m === 'object' ? m : { slug: m, relevance: Relevance.MINOR }))
 
-         await db.collection('pages').updateOne({ slug, pack }, { $set: { ...req.body, slug, mods } }, { upsert: true })
+         await Page.updateOne({ slug, pack }, { ...req.body, slug, mods }, { upsert: true })
+         
          return res.status(204).end()
       }
 

@@ -1,7 +1,7 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
-import Link from 'next/link'
 import { FC } from 'react'
+import Link from '../components/Link'
 
 export interface LinkPage {
    link: string

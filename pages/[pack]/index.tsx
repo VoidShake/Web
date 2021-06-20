@@ -1,17 +1,18 @@
 import styled from '@emotion/styled'
 import { Clock, Download } from '@styled-icons/fa-solid'
 import { GetServerSideProps } from 'next'
-import Link from 'next/link'
 import { FC, useMemo, useState } from 'react'
 import Background from '../../components/Background'
 import Layout from '../../components/Layout'
 import Line from '../../components/Line'
+import Link from '../../components/Link'
 import Modlist from '../../components/Modlist'
 import Pages, { LinkPage } from '../../components/Pages'
 import Title from '../../components/Title'
-import database from '../../database'
-import IMod from '../../interfaces/mod'
-import IPack from '../../interfaces/pack'
+import database, { serialize } from '../../database'
+import { IMod } from '../../database/models/Mod'
+import Pack, { IPack } from '../../database/models/Pack'
+import Release, { IRelease } from '../../database/models/Release'
 
 const PackView: FC<{
    mods: IMod[]
@@ -22,7 +23,7 @@ const PackView: FC<{
    links: IPack['links']
    pages: LinkPage[]
    version?: string
-}> = ({ name, assets, description, slug, links, version, ...props }) => {
+}> = ({ name, assets, description, version, slug, links, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
@@ -51,7 +52,7 @@ const PackView: FC<{
          <Background src={assets.background} />
 
          <Title noline>
-            {name}
+            {name} <Version>({version})</Version>
 
             <Subtitle>
                <Link href={`/${slug}/install/${download[0]}`}>
@@ -76,6 +77,11 @@ const PackView: FC<{
       </Layout>
    )
 }
+
+const Version = styled.span`
+   font-size: 1.2rem;
+   position: absolute;
+`
 
 const Subtitle = styled.h2`
    margin-top: 0.5rem;
@@ -104,61 +110,61 @@ const Description = styled.p`
    margin: 0 auto;
 `
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-   const { db } = await database()
+export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
+   await database()
 
-   const [pack] = await db
-      .collection<IPack>('packs')
-      .aggregate([
-         { $match: { slug: params?.pack } },
-         {
-            $lookup: {
-               from: 'pages',
-               localField: '_id',
-               foreignField: 'pack',
-               as: 'pages',
-            },
+   const [pack] = await Pack.aggregate<IPack>([
+      { $match: { slug: params?.pack } },
+      {
+         $lookup: {
+            from: 'pages',
+            localField: '_id',
+            foreignField: 'pack',
+            as: 'pages',
          },
-         { $unwind: '$mods' },
-         {
-            $lookup: {
-               from: 'pages',
-               let: {
-                  slug: '$mods.slug',
-               },
-               pipeline: [
-                  {
-                     $match: {
-                        $expr: {
-                           $in: ['$$slug', '$mods.slug'],
-                        },
-                     },
-                  },
-                  { $project: { _id: false } },
-               ],
-               as: 'mods.pages',
-            },
-         },
-         {
-            $group: {
-               _id: '$_id',
-               mods: { $push: '$mods' },
-               pages: { $first: '$pages' },
-               name: { $first: '$name' },
-               description: { $first: '$description' },
-               assets: { $first: '$assets' },
-               links: { $first: '$links' },
-               slug: { $first: '$slug' },
-               releases: { $first: '$releases' }
-            },
-         },
-      ])
-      .toArray()
+      }
+   ])
 
    if (!pack) return { notFound: true }
 
-   const version = pack.releases?.[0]?.version
-   delete pack.releases
+   const [release] = await Release.aggregate<IRelease>([
+      { $match: { pack: pack._id } },
+      { $match: { version: query?.version ?? { $exists: true } } },
+      { $sort: { date: -1 } },
+      { $unwind: '$mods' },
+      {
+         $lookup: {
+            from: 'pages',
+            let: {
+               slug: '$mods.slug',
+            },
+            pipeline: [
+               {
+                  $match: {
+                     $expr: {
+                        $in: ['$$slug', '$mods.slug'],
+                     },
+                  },
+               }
+            ],
+            as: 'mods.pages',
+         },
+      },
+      {
+         $group: {
+            _id: '$_id',
+            version: { $first: '$version' },
+            date: { $first: '$date' },
+            mods: { $push: '$mods' },
+         },
+      },
+      { $sort: { date: -1 } },
+   ])
+
+   if (!release && query.version) return { notFound: true }
+
+   const version = release?.version ?? null
+   const mods = release?.mods ?? []
 
    const pages =
       pack.pages?.map(({ slug, title }) => ({
@@ -167,7 +173,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
          link: `/${pack.slug}/${slug}`,
       })) ?? []
 
-   return { props: { ...pack, pages, version } }
+   return { props: { ...serialize(pack), mods: serialize(mods), pages, version } }
 }
 
 export default PackView

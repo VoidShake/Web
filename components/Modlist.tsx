@@ -2,7 +2,7 @@ import { css } from '@emotion/react'
 import styled from '@emotion/styled'
 import { flatten, uniqBy } from 'lodash'
 import { FC, useCallback, useMemo, useState } from 'react'
-import IMod from '../interfaces/mod'
+import { IMod } from '../database/models/Mod'
 import useTooltip from './hooks/useTooltip'
 import ModCard from './ModCard'
 
@@ -19,7 +19,7 @@ const Modlist: FC<{
    const categories = useMemo(() => uniqBy(flatten(mods.map(m => m.categories)), c => c.categoryId).filter(c => !HIDDEN_CATEGORIES.includes(c.categoryId)), [mods])
 
    const rank = useCallback((mod: IMod) => {
-      let rank = mod.popularityScore
+      let rank = mod.popularityScore ?? 0
       if (mod.library) rank -= 100000000000
       if (mod.pages?.some(p => p.mods.find(m => m.slug === mod.slug && m.relevance === 'major'))) rank += 1000000000
       return rank
@@ -59,7 +59,7 @@ const Modlist: FC<{
 
          <Grid>
             {sorted.map(mod => (
-               <ModCard {...mod} key={mod.id} onHover={() => events.onHover?.(mod)} onBlur={() => events.onHover?.()} fade={somethingHighlighted && !mod.highlight} />
+               <ModCard {...mod} key={mod.cfID} onHover={() => events.onHover?.(mod)} onBlur={() => events.onHover?.()} fade={somethingHighlighted && !mod.highlight} />
             ))}
          </Grid>
       </Container>

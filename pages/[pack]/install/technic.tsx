@@ -6,8 +6,8 @@ import Copy from '../../../components/Copy'
 import Layout from '../../../components/Layout'
 import LinkButton from '../../../components/LinkButton'
 import Title from '../../../components/Title'
-import database from '../../../database'
-import IPack from '../../../interfaces/pack'
+import database, { serialize } from '../../../database'
+import Pack, { IPack } from '../../../database/models/Pack'
 
 const PackView: FC<IPack> = ({ name, assets, description, links, slug }) => {
    return (
@@ -141,27 +141,24 @@ const Steps = styled.ul`
 `
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-   const { db } = await database()
+   await database()
 
-   const [pack] = await db
-      .collection<IPack>('packs')
-      .aggregate([
-         {
-            $project: {
-               name: true,
-               slug: true,
-               links: true,
-               assets: true,
-               description: true
-            }
-         },
-         { $match: { slug: params?.pack } },
-      ])
-      .toArray()
+   const [pack] = await Pack.aggregate<IPack>([
+      {
+         $project: {
+            name: true,
+            slug: true,
+            links: true,
+            assets: true,
+            description: true
+         }
+      },
+      { $match: { slug: params?.pack } },
+   ])
 
    if (!pack) return { notFound: true }
 
-   return { props: pack }
+   return { props: serialize(pack) }
 }
 
 export default PackView

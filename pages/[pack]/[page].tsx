@@ -5,19 +5,20 @@ import Layout from '../../components/Layout'
 import ModCard from '../../components/ModCard'
 import { Grid } from '../../components/Modlist'
 import Title from '../../components/Title'
-import database from '../../database'
-import IMod from '../../interfaces/mod'
-import IPack from '../../interfaces/pack'
-import IPage, { Relevance } from '../../interfaces/page'
+import database, { serialize } from '../../database'
+import { IMod } from '../../database/models/Mod'
+import { IPack } from '../../database/models/Pack'
+import Page, { IPage, Relevance } from '../../database/models/Page'
+import Release from '../../database/models/Release'
 
-const Page: FC<
+const DocuPage: FC<
    IPage<IMod> & {
       pack: {
          name: string
          link: string
       }
    }
-> = ({ title, content, mods, pack }) => {
+> = ({ title, content = [], mods, pack }) => {
    const fewMods = mods.length < 3 && content.length > 0
 
    return (
@@ -81,49 +82,48 @@ const Split = styled.div<{ right?: boolean }>`
 `
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-   const { db } = await database()
+   await database()
 
-   const [result] = await db
-      .collection<IPage & { pack: IPack[] }>('pages')
-      .aggregate([
-         { $project: { _id: false } },
-         { $match: { slug: params?.page.toString() } },
-         {
-            $lookup: {
-               from: 'packs',
-               localField: 'pack',
-               foreignField: '_id',
-               as: 'pack',
-            },
+   const [result] = await Page.aggregate<IPage & { pack: IPack }>([
+      { $match: { slug: params?.page.toString() } },
+      {
+         $lookup: {
+            from: 'packs',
+            localField: 'pack',
+            foreignField: '_id',
+            as: 'pack',
          },
-         {
-            $addFields: {
-               Pack: {
-                  $arrayElemAt: [
-                     {
-                        $filter: {
-                           input: '$Pack',
-                           as: 'pack',
-                           cond: {
-                              $eq: ['$$pack.slug', params?.pack],
-                           },
+      },
+      {
+         $addFields: {
+            pack: {
+               $arrayElemAt: [
+                  {
+                     $filter: {
+                        input: '$pack',
+                        as: 'pack',
+                        cond: {
+                           $eq: ['$$pack.slug', params?.pack],
                         },
                      },
-                     0,
-                  ],
-               },
+                  },
+                  0,
+               ],
             },
          },
-      ])
-      .toArray()
+      },
+   ])
 
    if (!result) return { notFound: true }
 
-   const { pack: [pack], ...page } = result
+   const { pack, ...page } = result
 
    if (!pack) return { notFound: true }
+   const release = await Release.findOne({ pack: pack.id })
 
-   const unsorted = pack.mods.map(mod => ({ ...mod, relevance: undefined, ...page.mods.find(m => m.slug === mod.slug) })).filter(mod => !!mod.relevance)
+   const unsorted = (release?.mods ?? [])
+      .map(mod => ({ ...mod, relevance: undefined, ...page.mods.find(m => m.slug === mod.slug) }))
+      .filter(mod => !!mod.relevance)
 
    const mods = unsorted.sort((a, b) => {
       const [ra, rb] = [a, b].map(x => Object.values(Relevance).indexOf(x.relevance ?? Relevance.MINOR))
@@ -132,8 +132,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    return {
       props: {
-         ...page,
-         mods,
+         ...serialize(page),
+         mods: serialize(mods),
          pack: {
             name: pack.name,
             link: `/${pack.slug}`,
@@ -142,4 +142,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    }
 }
 
-export default Page
+export default DocuPage

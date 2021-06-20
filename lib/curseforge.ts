@@ -1,4 +1,4 @@
-import IMod from '../interfaces/mod'
+import { IMod } from "../database/models/Mod"
 
 const BASE_URL = 'https://addons-ecs.forgesvc.net/api/v2'
 
@@ -16,11 +16,10 @@ interface RawMod {
 }
 
 interface RawPack {
-   name: string
-   slug: string
    installedAddons: {
       addonID: number
       installedFile: {
+         fileDate: string
          displayName: string
          categorySectionPackageType: number
          dependencies: Array<{
@@ -38,16 +37,20 @@ export function getMod(id: number): Promise<RawMod> {
 }
 
 export async function getMods(pack: RawPack): Promise<IMod[]> {
-   const addons: Array<Partial<IMod> & { id: number }> = pack.installedAddons
+   const addons = pack.installedAddons
       .filter(a => a.installedFile.modules.some(m => m.foldername === 'META-INF'))
-      .map(({ addonID }) => ({
-         id: addonID,
+      .map(({ addonID, installedFile }) => ({
+         cfID: addonID,
+         version: {
+            date: installedFile.fileDate,
+            file: installedFile.displayName,
+         },
          library: pack.installedAddons.some(a => a.installedFile.dependencies.some(d => d.addonId === addonID)),
       }))
 
    return Promise.all(
       addons.map(async a => {
-         const { attachments, primaryCategoryId, categories, ...mod } = await getMod(a.id)
+         const { attachments, primaryCategoryId, categories, ...mod } = await getMod(a.cfID)
 
          const libIds = [421, 425, 423, 435]
 
