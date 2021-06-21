@@ -45,7 +45,6 @@ function decode(token: string) {
 
 export function tokenSession(req: NextApiRequest): Session | null {
    const [type, token] = req.headers.authorization?.split(' ') ?? []
-   console.log('Token:', req.headers.authorization, type, token)
    if (type === 'Bearer' || type === 'Token') {
       if (token) return { token: decode(token) }
    }
