@@ -1,11 +1,12 @@
 import { css, Global } from '@emotion/react'
+import { Provider } from 'next-auth/client'
 import { AppComponent } from 'next/dist/next-server/lib/router/router'
 import React from 'react'
 import '../style/reset.css'
 
 const App: AppComponent = ({ Component, pageProps }) => {
    return (
-      <>
+      <Provider session={pageProps.session}>
          <Global
             styles={css`
                body {
@@ -27,7 +28,7 @@ const App: AppComponent = ({ Component, pageProps }) => {
             `}
          />
          <Component {...pageProps} />
-      </>
+      </Provider>
    )
 }
 

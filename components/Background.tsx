@@ -56,6 +56,8 @@ const Background: FC<ImgHTMLAttributes<HTMLImageElement> & {
    const [blur, setBlur] = useState(true)
    const [maximized, setMaximized] = useState(false)
 
+   if(!props.src) return null
+
    return (
       <>
          <Show title='Maximize background' onMouseOver={() => setBlur(false)} onMouseLeave={() => setBlur(true)} onClick={() => setMaximized(true)}>

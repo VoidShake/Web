@@ -1,12 +1,12 @@
 import Joi from 'joi'
 import Release from '../../../../database/models/Release'
 import { getMods } from '../../../../lib/curseforge'
+import { getPack } from '../../../../lib/token'
 import validate from '../../../../lib/validate'
 
 const handler = validate(
    {
       query: {
-         id: Joi.string().required(),
          version: Joi.string().required(),
       },
       body: {
@@ -18,8 +18,10 @@ const handler = validate(
          changelog: Joi.string().required(),
       },
    },
-   async (req, res) => {
-      const { id, version } = req.query
+   async (req, res, session) => {
+      const { version } = req.query
+
+      const { id } = await getPack(session)
 
       if (req.method === 'PUT') {
 

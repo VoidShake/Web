@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import slugify from 'slugify'
 import Page, { Relevance } from '../../../database/models/Page'
+import { getPack } from '../../../lib/token'
 import validate from '../../../lib/validate'
 
 const handler = validate(
@@ -27,16 +28,17 @@ const handler = validate(
             .required(),
       },
    },
-   async (req, res) => {
+   async (req, res, session) => {
+
+      const pack = await getPack(session)
 
       if (req.method === 'PUT') {
          const slug = slugify(req.body.title, { lower: true })
-         const { pack } = req.body
 
          const mods = req.body.mods.map((m: unknown) => (typeof m === 'object' ? m : { slug: m, relevance: Relevance.MINOR }))
 
-         await Page.updateOne({ slug, pack }, { ...req.body, slug, mods }, { upsert: true })
-         
+         await Page.updateOne({ slug, pack: pack.id }, { ...req.body, slug, mods }, { upsert: true })
+
          return res.status(204).end()
       }
 

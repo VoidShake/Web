@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import React, { FC, ReactNode } from 'react'
+import Footer from './Footer'
 import Navbar from './Navbar'
 
 const Layout: FC<{
@@ -28,8 +29,11 @@ const Layout: FC<{
          <link rel='manifest' href='/manifest.json' />
       </Head>
       <Navbar />
+      
       {children}
+
+      <Footer />
+
    </div>
 )
-
 export default Layout
