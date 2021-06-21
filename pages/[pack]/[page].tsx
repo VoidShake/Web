@@ -119,16 +119,18 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    const { pack, ...page } = result
 
    if (!pack) return { notFound: true }
-   const release = await Release.findOne({ pack: pack.id })
+   const release = await Release.findOne({ pack: pack._id })
 
-   const unsorted = (release?.mods ?? [])
-      .map(mod => ({ ...mod, relevance: undefined, ...page.mods.find(m => m.slug === mod.slug) }))
+   const unsorted = (release?.toJSON()?.mods ?? [])
+      .map(mod => ({ ...mod, relevance: page.mods.find(m => m.slug === mod.slug)?.relevance }))
       .filter(mod => !!mod.relevance)
 
    const mods = unsorted.sort((a, b) => {
       const [ra, rb] = [a, b].map(x => Object.values(Relevance).indexOf(x.relevance ?? Relevance.MINOR))
       return ra - rb
    })
+
+   console.log(unsorted)
 
    return {
       props: {

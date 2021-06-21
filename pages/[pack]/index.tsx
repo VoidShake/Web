@@ -143,6 +143,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
             pipeline: [
                {
                   $match: {
+                     pack: pack._id,
                      $expr: {
                         $in: ['$$slug', '$mods.slug'],
                      },
