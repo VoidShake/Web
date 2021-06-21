@@ -37,7 +37,7 @@ const schema = new Schema({
       slug: { type: String, required: true },
       relevance: { type: String, required: true },
    })],
-   context: [new Schema({
+   content: [new Schema({
       text: String,
       image: String,
    })]
