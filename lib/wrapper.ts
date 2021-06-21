@@ -17,8 +17,6 @@ export default function wrapper(handler: AuthenticatedApiHandler): NextApiHandle
 
       const session = tokenSession(req) ?? await getSession({ req })
 
-      console.log(session)
-
       if (!session) throw new ApiError(403, 'Unauthorized')
 
       return handler(req, res, session)
