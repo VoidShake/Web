@@ -16,15 +16,15 @@ const PackView: FC<{
    slug: string
    assets: IPack['assets']
    releases: IRelease[]
-}> = ({ name, assets = {}, releases, slug }) => {
+}> = ({ name, assets, releases, slug }) => {
 
    const tooltip = useTooltip('release')
 
    return (
-      <Layout title={name} image={assets.icon} description={`Changelog for ${name}`}>
+      <Layout title={name} image={assets?.icon} description={`Changelog for ${name}`}>
          {tooltip}
 
-         <Background src={assets.background} size={0.5} />
+         <Background src={assets?.background} size={0.5} />
 
          <Title noline subtitle={{ link: `/${slug}`, name }}>
             Changelog

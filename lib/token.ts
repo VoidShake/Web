@@ -11,13 +11,13 @@ export interface Token {
    created: number
 }
 
-async function isAuthorized(session: Session, packId: string) {
-   if (session.packToken) return packId === session.packToken.pack
+export async function isAuthorized(session: Session | undefined | null, packId: string) {
+   if (session?.packToken) return packId === session.packToken.pack
    const pack = await Pack.findById(packId)
-   return pack && session.user?.email === pack.author
+   return pack && session && session.user?.email === pack.author
 }
 
-export async function authorized(session: Session, packId: string) {
+export async function authorized(session: Session | undefined | null, packId: string) {
    if (!await isAuthorized(session, packId)) throw new ApiError(403, 'Unauthorized')
 }
 
