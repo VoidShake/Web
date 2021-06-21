@@ -1,19 +1,20 @@
 import Joi from 'joi'
 import { ApiError } from 'next/dist/next-server/server/api-utils'
 import Pack from '../../../database/models/Pack'
-import { getMods } from '../../../lib/curseforge'
 import { getPack } from '../../../lib/token'
 import validate from '../../../lib/validate'
+import wrapper from '../../../lib/wrapper'
 
-const handler = validate(
-   {
-      body: {
-         name: Joi.string().required(),
-      },
-   },
+const handler = wrapper(
    async (req, res, session) => {
 
       if (req.method === 'POST') {
+
+         validate(req, {
+            body: {
+               name: Joi.string().required(),
+            },
+         })
 
          if (!session.user) throw new ApiError(403, 'Pack creation requires user')
 
@@ -24,12 +25,17 @@ const handler = validate(
 
       if (req.method === 'PUT') {
 
+         validate(req, {
+            body: {
+               name: Joi.string().optional(),
+               description: Joi.string().optional(),
+               links: Joi.object().pattern(/^/, Joi.string())
+            },
+         })
+
          const { id } = await getPack(session)
 
-         const { name, author, description, links } = req.body
-         const mods = await getMods(req.body)
-
-         await Pack.findByIdAndUpdate(id, { name, mods, author, description, links })
+         await Pack.findByIdAndUpdate(id, req.body)
 
          return res.status(204).end()
       }

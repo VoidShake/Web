@@ -1,6 +1,6 @@
 import Joi, { ValidationOptions } from 'joi'
-import { NextApiHandler, NextApiRequest } from 'next'
-import wrapper, { AuthenticatedApiHandler } from './wrapper'
+import { NextApiRequest } from 'next'
+import { ApiError } from 'next/dist/next-server/server/api-utils'
 
 type Schema = Record<string, Joi.Schema>
 
@@ -10,39 +10,27 @@ type RequestSchema = {
    [K in SchemaKey]?: Schema
 }
 
-export default function validate(
-   schema: RequestSchema,
-   handlerOrOptions: AuthenticatedApiHandler | ValidationOptions,
-   handler?: AuthenticatedApiHandler
-): NextApiHandler {
-   const h = typeof handlerOrOptions === 'function' ? handlerOrOptions : handler
-   const o = typeof handlerOrOptions === 'function' ? {} : handlerOrOptions
-   if (!h) throw new Error('NextApiHandler missing')
+export default function validate(req: NextApiRequest, schema: RequestSchema, additionalOptions?: ValidationOptions) {
 
    const options: ValidationOptions = {
       stripUnknown: true,
-      ...o,
+      ...additionalOptions,
    }
 
    const predicates = Object.entries(schema)
       .map(([key, blueprint]) => ({ schema: Joi.object(blueprint), key: key as keyof NextApiRequest }))
       .map(({ key, schema }) => (req: NextApiRequest) => schema.validate(req[key], options))
 
-   return wrapper((req, res, session) => {
-      const results = predicates.map(p => p(req))
-      const error = results.map(r => r.error).find(e => !!e)
+   const results = predicates.map(p => p(req))
+   const error = results.map(r => r.error).find(e => !!e)
 
-      if (error) {
-         res.status(400).json({
-            error: error.message,
-         })
-      } else {
+   if (error) {
+      throw new ApiError(400, error.message)
+   } else {
 
-         Object.keys(schema).map(k => k as SchemaKey).forEach((key, i) => {
-            req[key] = results[i].value
-         })
+      Object.keys(schema).map(k => k as SchemaKey).forEach((key, i) => {
+         req[key] = results[i].value
+      })
 
-         return h(req, res, session)
-      }
-   })
+   }
 }
