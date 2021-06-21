@@ -16,7 +16,7 @@ const PackView: FC<{
    slug: string
    assets: IPack['assets']
    releases: IRelease[]
-}> = ({ name, assets, releases, slug }) => {
+}> = ({ name, assets = {}, releases, slug }) => {
 
    const tooltip = useTooltip('release')
 

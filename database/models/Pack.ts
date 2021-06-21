@@ -6,11 +6,12 @@ import { IPage } from "./Page";
 
 export interface IPack extends Model {
    name: string
+   author: string
    description: string
    slug: string
    pages?: IPage[]
-   assets: Record<string, string | undefined>
-   links: Record<string, string | undefined>
+   assets?: Record<string, string | undefined>
+   links?: Record<string, string | undefined>
 }
 
 const schema = new Schema({
@@ -18,6 +19,10 @@ const schema = new Schema({
       type: String,
       required: true,
       unique: true,
+   },
+   author: {
+      type: String,
+      required: true
    },
    description: String,
    slug: String,

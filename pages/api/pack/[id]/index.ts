@@ -2,6 +2,7 @@ import Joi from 'joi'
 import slugify from 'slugify'
 import Pack from '../../../../database/models/Pack'
 import { getMods } from '../../../../lib/curseforge'
+import { authorized } from '../../../../lib/token'
 import validate from '../../../../lib/validate'
 
 const handler = validate(
@@ -14,8 +15,10 @@ const handler = validate(
          installedAddons: Joi.array().required(),
       },
    },
-   async (req, res) => {
+   async (req, res, session) => {
       const { id } = req.query
+
+      await authorized(session, id as string)
 
       if (req.method === 'PUT') {
 
@@ -29,7 +32,7 @@ const handler = validate(
             $set: values,
             //$push: { releases: { release } }
          }, { upsert: true })
-         
+
          return res.status(204).end()
       }
 

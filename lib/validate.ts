@@ -28,7 +28,7 @@ export default function validate(
       .map(([key, blueprint]) => ({ schema: Joi.object(blueprint), key: key as keyof NextApiRequest }))
       .map(({ key, schema }) => (req: NextApiRequest) => schema.validate(req[key], options))
 
-   return wrapper((req, res) => {
+   return wrapper((req, res, session) => {
       const results = predicates.map(p => p(req))
       const error = results.map(r => r.error).find(e => !!e)
 
@@ -42,7 +42,7 @@ export default function validate(
             req[key] = results[i].value
          })
 
-         return h(req, res)
+         return h(req, res, session)
       }
    })
 }

@@ -9,13 +9,13 @@ import Title from '../../../components/Title'
 import database, { serialize } from '../../../database'
 import Pack, { IPack } from '../../../database/models/Pack'
 
-const PackView: FC<IPack> = ({ name, assets, description, links, slug }) => {
+const PackView: FC<IPack> = ({ name, assets, links, description, slug }) => {
    return (
-      <Layout title={name} image={assets.icon} description={description}>
+      <Layout title={name} image={assets?.icon} description={description}>
 
          <Title subtitle={{ link: `/${slug}`, name }}>Install using Technic</Title>
 
-         {links.technic
+         {links?.technic
             ? <Steps>
 
                <Step mark={1} title='Download technic launcher' image='/technic/icon.png'>

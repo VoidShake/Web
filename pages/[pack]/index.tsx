@@ -23,7 +23,7 @@ const PackView: FC<{
    links: IPack['links']
    pages: LinkPage[]
    version?: string
-}> = ({ name, assets, description, version, slug, links, ...props }) => {
+}> = ({ name, assets = {}, links = {}, description, version, slug, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
@@ -52,12 +52,14 @@ const PackView: FC<{
          <Background src={assets.background} />
 
          <Title noline>
-            {name} <Version>({version})</Version>
+            {name} {version && <Version>({version})</Version>}
 
             <Subtitle>
-               <Link href={`/${slug}/install/${download[0]}`}>
-                  <Links> Download <Download size={20} /></Links>
-               </Link>
+               {download &&
+                  <Link href={`/${slug}/install/${download[0]}`}>
+                     <Links> Download <Download size={20} /></Links>
+                  </Link>
+               }
 
                <Link href={`/${slug}/changelog`}>
                   <Links> Changelog <Clock size={20} /></Links>

@@ -1,19 +1,14 @@
-import Joi from 'joi'
 import { parse } from 'path'
-import Pack from '../../../../../database/models/Pack'
-import parseFiles from '../../../../../lib/requestFiles'
-import { save } from '../../../../../lib/storage'
-import validate from '../../../../../lib/validate'
+import Pack from '../../../database/models/Pack'
+import parseFiles from '../../../lib/requestFiles'
+import { save } from '../../../lib/storage'
+import { getPack } from '../../../lib/token'
+import wrapper from '../../../lib/wrapper'
 
-const handler = validate(
-   {
-      query: {
-         id: Joi.string().required(),
-      },
-   },
-   async (req, res) => {
-      const { id } = req.query
+const handler = wrapper(
+   async (req, res, session) => {
 
+      const { id } = await getPack(session)
 
       if (req.method === 'PUT') {
          const files = await parseFiles(req)
