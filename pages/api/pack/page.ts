@@ -14,7 +14,6 @@ const handler = wrapper(async (req, res, session) => {
       validate(req, {
          body: {
             title: Joi.string().required(),
-            pack: Joi.string().required(),
             mods: Joi.array().items(
                Joi.alternatives(
                   Joi.string(),
