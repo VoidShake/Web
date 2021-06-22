@@ -1,47 +1,37 @@
 import Joi from 'joi'
+import { NextApiHandler } from 'next'
 import { ApiError } from 'next/dist/next-server/server/api-utils'
 import Pack from '../../../database/models/Pack'
-import { getPack } from '../../../lib/token'
+import { forwardTokenRequest } from '../../../lib/token'
 import validate from '../../../lib/validate'
 import wrapper from '../../../lib/wrapper'
+import updateHandler from './[id]'
 
-const handler = wrapper(
-   async (req, res, session) => {
+const handler: NextApiHandler = (req, res) => {
 
-      if (req.method === 'POST') {
+   if (req.method === 'POST') return postRequest(req, res)
+   if (req.method === 'PUT') return putRequest(req, res)
 
-         validate(req, {
-            body: {
-               name: Joi.string().required(),
-            },
-         })
+   res.status(400).send({ error: 'Invalid method' })
 
-         if (!session.user) throw new ApiError(403, 'Pack creation requires user')
+}
 
-         const pack = await Pack.create({ ...req.body, author: session.user.email })
+const putRequest = forwardTokenRequest(updateHandler)
 
-         return res.json(pack)
-      }
+const postRequest = wrapper(async (req, res, session) => {
 
-      if (req.method === 'PUT') {
+   validate(req, {
+      body: {
+         name: Joi.string().required(),
+      },
+   })
 
-         validate(req, {
-            body: {
-               name: Joi.string().optional(),
-               description: Joi.string().optional(),
-               links: Joi.object().pattern(/^/, Joi.string())
-            },
-         })
+   if (!session.user) throw new ApiError(403, 'Pack creation requires user')
 
-         const { id } = await getPack(session)
+   const pack = await Pack.create({ ...req.body, author: session.user.email })
 
-         await Pack.findByIdAndUpdate(id, req.body)
+   res.json(pack)
 
-         return res.status(204).end()
-      }
-
-      res.status(400).send({ error: 'Invalid method' })
-   }
-)
+})
 
 export default handler

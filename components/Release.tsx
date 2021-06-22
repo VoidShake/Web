@@ -24,7 +24,7 @@ const Release: FC<IRelease> = ({ version, name, changelog, date, children }) => 
 
          <Buttons>
             <Link href={`/${query.pack}/diff/${version}`}>
-               <More data-tip='Compare with current version' data-for='release'>
+               <More data-tip='Detailed changes' data-for='release'>
                   More
                </More>
             </Link>

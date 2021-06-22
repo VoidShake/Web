@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { NextApiRequest } from "next";
+import { NextApiHandler, NextApiRequest } from "next";
 import { Session } from "next-auth";
 import { ApiError } from "next/dist/next-server/server/api-utils";
 import Pack from "../database/models/Pack";
+import wrapper, { AuthenticatedApiHandler } from './wrapper';
 
 const KEY = process.env.JWT_SECRET
 
@@ -49,4 +50,12 @@ export function tokenSession(req: NextApiRequest): Session | null {
       if (token) return { packToken: decode(token) }
    }
    return null
+}
+
+export function forwardTokenRequest(handler: AuthenticatedApiHandler, key = 'id'): NextApiHandler {
+   return wrapper((req, res, session) => {
+      if (!session.packToken) throw new ApiError(403, 'Pack token required')
+      req.query[key] = session.packToken.pack
+      return handler(req, res, session)
+   })
 }
