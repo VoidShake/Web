@@ -1,5 +1,4 @@
 import { css, Global, Theme, ThemeProvider, useTheme } from '@emotion/react'
-import { } from 'next-auth'
 import { Provider as AuthProvider } from 'next-auth/client'
 import { AppComponent } from 'next/dist/next-server/lib/router/router'
 import React, { FC, useEffect, useReducer } from 'react'
