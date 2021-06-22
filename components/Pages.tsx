@@ -1,5 +1,7 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
+import { } from 'lodash'
+import { invert, mix } from 'polished'
 import { FC } from 'react'
 import Link from '../components/Link'
 
@@ -38,14 +40,13 @@ const Page = styled.li<{ highlight?: boolean }>`
    ${p =>
       p.highlight &&
       css`
-         background: #8a804e;
-         outline: 2px solid #eddd93;
-         //box-shadow: 0 0 8px 0 #eddd93;
+         background: ${p.theme.primary};
+         outline: 2px solid ${mix(0.4, p.theme.text, p.theme.primary)};
       `}
 
    &:hover {
-      background: #ddd;
-      color: black;
+      background: ${p => p.theme.secondary};
+      color: ${p => invert(p.theme.text)};
       cursor: pointer;
    }
 `
@@ -69,7 +70,7 @@ const List = styled.ul`
 
    a {
       text-decoration: none;
-      color: #eee;
+      color: ${p => p.theme.text};
    }
 `
 

@@ -30,7 +30,7 @@ export const TimelineDot: FC = () => {
 
 const Line = styled.div`
    position: absolute;
-   background: linear-gradient(transparent, #BBB 4rem, #EEE calc(100% - 4rem), transparent);
+   background: linear-gradient(transparent, #BBB 4rem, ${p => p.theme.secondary} calc(100% - 4rem), transparent);
    width: 2px;
    height: calc(100% - 4rem);
    margin: 0 auto;
@@ -44,7 +44,7 @@ const Dot = styled.div<{ top: number }>`
    left: calc(1px - 0.5rem);
    width: 1rem;
    height: 1rem;
-   background: #EEE;
+   background: ${p => p.theme.secondary};
    border-radius: 9999px;
 `
 

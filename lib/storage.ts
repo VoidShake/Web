@@ -1,6 +1,7 @@
 import { File } from 'formidable'
 import { createReadStream, existsSync, mkdirSync, renameSync, statSync } from 'fs'
 import { NextApiResponse } from 'next'
+import { ApiError } from 'next/dist/next-server/server/api-utils'
 import { extname, join } from 'path'
 
 const STORAGE_PATH = process.env.STORAGE_PATH ?? 'storage'
@@ -28,6 +29,7 @@ export function save(file: File, ...location: string[]) {
 }
 
 export function sendFile(res: NextApiResponse, ...location: string[]) {
+   if(!exists(...location)) throw new ApiError(404, 'File not found')
    const path = getPath(...location)
    const ext = extname(path).substring(1)
    const { size } = statSync(path)

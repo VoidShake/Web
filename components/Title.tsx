@@ -20,7 +20,7 @@ const Subtitle = styled.p`
    a {
       font-size: 1.5rem;
       text-decoration: none;
-      color: #eee;
+      color: ${p => p.theme.text};
    }
 
    &:hover {

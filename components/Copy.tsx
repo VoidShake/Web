@@ -1,5 +1,6 @@
 import styled from "@emotion/styled"
 import { Copy as Icon } from "@styled-icons/fa-solid"
+import { invert } from "polished"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import useTooltip from "./hooks/useTooltip"
 
@@ -18,8 +19,8 @@ const Text = styled.button`
    }
 
    &:hover {
-      background: #EEE;
-      color: black;
+      background: ${p => p.theme.secondary};
+      color: ${p => invert(p.theme.secondary)};
       cursor: copy;
    }
 

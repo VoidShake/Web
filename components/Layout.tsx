@@ -1,3 +1,4 @@
+import styled from '@emotion/styled'
 import Head from 'next/head'
 import React, { FC, ReactNode } from 'react'
 import Footer from './Footer'
@@ -9,7 +10,7 @@ const Layout: FC<{
    image?: string
    description?: string
 }> = ({ children, title = 'Modpacks', image = '/icon.png', description }) => (
-   <div>
+   <Style>
       <Head>
          <title>{title}</title>
          <meta charSet='utf-8' />
@@ -34,6 +35,12 @@ const Layout: FC<{
 
       <Footer />
 
-   </div>
+   </Style>
 )
+
+const Style = styled.section`
+   padding-bottom: 50px;
+   position: relative;
+`
+
 export default Layout

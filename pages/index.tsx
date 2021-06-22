@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
+import { invert } from 'polished'
 import { FC } from 'react'
 import Layout from '../components/Layout'
 import Link from '../components/Link'
@@ -36,8 +37,8 @@ const List = styled.ul`
 
       transition: all 0.1s linear;
       &:hover {
-         background: #ddd;
-         color: black;
+         background: ${p => p.theme.secondary};
+         color: ${p => invert(p.theme.text)};
       }
    }
 `

@@ -15,7 +15,7 @@ const Container = styled.div`
       position: absolute;
       z-index: -1;
 
-      background: #eee;
+      background: ${p => p.theme.secondary};
       border-radius: 999px;
       transition: height 0.05s linear, width 0.05s linear;
 

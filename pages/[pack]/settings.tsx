@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/client'
-import { FC, useCallback } from 'react'
+import { FC } from 'react'
+import Copy from '../../components/Copy'
 import Layout from '../../components/Layout'
 import Title from '../../components/Title'
 import database, { serialize } from '../../database'
@@ -11,16 +12,12 @@ const PackSettings: FC<IPack & {
    token: string
 }> = ({ name, description, slug, assets, token }) => {
 
-   const copyToken = useCallback(() => {
-      navigator.clipboard.writeText(token)
-   }, [token])
-
    return (
       <Layout title={name} image={assets?.icon} description={description}>
 
          <Title subtitle={{ link: `/${slug}`, name }}>Settings</Title>
 
-         <button onClick={copyToken}>Copy token</button>
+         <Copy content={token}>Copy Token</Copy>
 
       </Layout>
    )

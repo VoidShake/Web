@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { darken } from 'polished';
 import { Dispatch, ReactText } from "react";
 
 function Select<T extends ReactText>({ values, value, onChange }: {
@@ -16,17 +17,18 @@ function Select<T extends ReactText>({ values, value, onChange }: {
 }
 
 const Style = styled.select`
-   color: #EEE;
+   color: ${p => p.theme.text};
    border-radius: 0.5rem;
    padding: 0.3rem;
 
    transition: background 0.1s ease;
+   
    &:hover {
-      background: #0002;
+      background: ${p => darken(0.05, p.theme.bg)};
    }
 
    option {
-      background: #0002;
+      background: ${p => darken(0.05, p.theme.bg)};
    }
 `
 

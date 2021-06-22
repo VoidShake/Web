@@ -1,6 +1,7 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
 import { flatten, uniqBy } from 'lodash'
+import { invert } from 'polished'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { IMod } from '../database/models/Mod'
 import useTooltip from './hooks/useTooltip'
@@ -76,13 +77,13 @@ const Category = styled.li<{ selected?: boolean }>`
    ${p =>
       p.selected &&
       css`
-         background: #ddd;
-         color: black;
+      background: ${p.theme.secondary};
+      color: ${invert(p.theme.text)};
       `}
 
    &:hover {
-      background: #ddd;
-      color: black;
+      background: ${p => p.theme.secondary};
+      color: ${p => invert(p.theme.text)};
    }
 `
 

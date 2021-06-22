@@ -5,6 +5,7 @@ import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { FC, useCallback, useMemo } from 'react'
 import Layout from '../../../components/Layout'
+import Line from '../../../components/Line'
 import MinifiedList from '../../../components/MinifiedList'
 import ModLine, { Change, ChangeStyle, getChange, VersionedMod } from '../../../components/ModLine'
 import Select from '../../../components/Select'
@@ -19,7 +20,8 @@ const Diff: FC<{
    to: IRelease
    pack: IPack
    versions: string[]
-}> = ({ from, to, pack, versions }) => {
+   changes: Array<{ changelog: string, version: string }>
+}> = ({ from, to, pack, versions, changes }) => {
    const router = useRouter()
 
    const mods = useMemo(() => {
@@ -51,7 +53,7 @@ const Diff: FC<{
    return (
       <Layout title={`Comparison ${from.version} > ${to.version}`}>
 
-         <Title noline subtitle={{ ...pack, link: `/${pack.slug}` }}>
+         <Title  subtitle={{ ...pack, link: `/${pack.slug}` }}>
             Comparing
             <Versions>
                <Select value={from.version} values={versions} onChange={from => select({ from })} />
@@ -63,6 +65,18 @@ const Diff: FC<{
          {from.version === to.version &&
             <Center as='h3'>Select two different versions</Center>
          }
+
+         <Changes>
+            {changes.map(({ changelog, version }) =>
+               <div key={version}>{
+                  changelog.split('\n').map((line, i) =>
+                     <p key={`${version}-${i}`}>{line}</p>
+                  )
+               }</div>
+            )}
+         </Changes>
+
+         <Line />
 
          <Stats>
             {lists.map(([change, list]) =>
@@ -87,6 +101,22 @@ const Diff: FC<{
       </Layout>
    )
 }
+
+const Changes = styled.div`
+   display: flex;
+   gap: 1rem;
+   padding: 1rem;
+   //grid-template-columns: repeat(auto-fill, 600px);
+   justify-content: center;
+   flex-direction: column;
+   flex-wrap: wrap;
+   max-height: 600px;
+
+   > div {
+      padding: 1rem 1.5rem;
+      background: #0002;
+   }
+`
 
 const Stats = styled.div`
    display: grid;
@@ -124,16 +154,33 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    const releases = await Release.find({ pack: pack._id }, { version: true }, { sort: { date: -1 } })
 
-   const [from, to] = await Promise.all<IRelease>(versions
-      .map(it => it?.toString())
-      .map(version => Release.findOne({ version, pack: pack._id }).then(r => serialize(r))))
+   const matches = await Promise.all(versions.map(v =>
+      Release.findOne(
+         { pack: pack._id, version: v === 'current' ? { $exists: true } : v },
+         undefined,
+         { sort: { date: -1 } }
+      )
+   ))
+
+   if (matches.length === 1 && matches[0]) {
+      matches.push(await Release.findOne({ date: { $gt: matches[0].date } }, undefined, { sort: { date: 1 } }))
+   }
+
+   const [from, to] = matches.map<IRelease>(serialize)
 
    if (!from || !to) return { notFound: true }
+
+   const changes = await Release.find(
+      { date: { $gte: from.date, $lt: to.date }, changelog: { $exists: true } },
+      { changelog: true, version: true },
+      { sort: { date: -1 } }
+   )
 
    return {
       props: {
          from, to,
          pack: serialize(pack),
+         changes: serialize(changes),
          versions: releases.map(it => it.version),
       },
    }

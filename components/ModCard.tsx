@@ -1,14 +1,11 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
+import { darken, invert } from 'polished'
 import { FC, useMemo } from 'react'
 import { IMod } from '../database/models/Mod'
 import InvisibleLink from './InvisibleLink'
 
-const Style = {
-   HIGHLIGHTED: { background: '#EEE', text: '#000' },
-   LIBRARY: { background: '#559aed77', text: '#EEE' },
-   MAJOR: { background: '#8a804e', text: '#EEE' },
-}
+type Scheme = 'highlighted' | 'library' | 'major'
 
 const ModCard: FC<
    IMod & {
@@ -16,10 +13,10 @@ const ModCard: FC<
       onBlur?: () => void
    }
 > = ({ websiteUrl, name, icon, library, pages, slug, highlight, fade, ...events }) => {
-   const style = useMemo(() => {
-      if (highlight) return Style.HIGHLIGHTED
-      if (library) return Style.LIBRARY
-      if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return Style.MAJOR
+   const scheme = useMemo<Scheme | undefined>(() => {
+      if (highlight) return 'highlighted'
+      if (library) return 'library'
+      if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return 'major'
    }, [library, pages, highlight])
 
    const info = `Referenced in ${pages?.length} ${pages?.length === 1 ? 'page' : 'pages'}`
@@ -27,7 +24,7 @@ const ModCard: FC<
 
    return (
       <InvisibleLink href={websiteUrl}>
-         <Card fade={fade} {...style} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
+         <Card fade={fade} scheme={scheme} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
             <img alt={name} src={icon} />
             <h3>{name}</h3>
             {library && <Lib>Library</Lib>}
@@ -68,12 +65,25 @@ const Lib = styled.span`
    border-radius: 99999px;
 `
 
-const Card = styled.div<Partial<typeof Style.HIGHLIGHTED> & { glow?: boolean; fade?: boolean }>`
+const Card = styled.div<{ glow?: boolean; fade?: boolean, scheme?: Scheme }>`
    position: relative;
    text-align: center;
 
-   background: ${p => p.background ?? '#0002'};
-   color: ${p => p.text ?? '#EEE'};
+   background: ${p => darken(0.05, p.theme.bg)};
+   color: ${p => p.theme.text};
+
+   ${p => p.scheme === 'highlighted' && css`
+      background: ${p.theme.secondary};
+      color: ${invert(p.theme.text)};
+   `}
+
+   ${p => p.scheme === 'library' && css`
+      background: '#559aed77';
+   `}
+
+   ${p => p.scheme === 'major' && css`
+      background: ${p.theme.primary};
+   `}
 
    opacity: ${p => (p.fade ? 0.2 : 1)};
 
@@ -89,8 +99,8 @@ const Card = styled.div<Partial<typeof Style.HIGHLIGHTED> & { glow?: boolean; fa
 
    &:hover {
       transform: translateY(-0.4rem);
-      background: #ddd;
-      color: black;
+      background: ${p => p.theme.secondary};
+      color: ${p => invert(p.theme.text)};
    }
 
    display: grid;

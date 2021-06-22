@@ -1,18 +1,39 @@
-import { css, Global } from '@emotion/react'
-import { Provider } from 'next-auth/client'
+import { css, Global, Theme, ThemeProvider, useTheme } from '@emotion/react'
+import { } from 'next-auth'
+import { Provider as AuthProvider } from 'next-auth/client'
 import { AppComponent } from 'next/dist/next-server/lib/router/router'
-import React from 'react'
+import React, { FC, useEffect, useReducer } from 'react'
 import '../style/reset.css'
+import dark from '../themes/dark'
+import light from '../themes/light'
 
 const App: AppComponent = ({ Component, pageProps }) => {
+   const [theme, toggleTheme] = useReducer((current: Theme) => current === dark ? light : dark, dark)
+
+   useEffect(() => {
+      window.addEventListener('keyup', toggleTheme)
+      return () => window.removeEventListener('keyup', toggleTheme)
+   }, [toggleTheme])
+
    return (
-      <Provider session={pageProps.session}>
-         <Global
-            styles={css`
+      <ThemeProvider theme={theme}>
+         <AuthProvider session={pageProps.session}>
+            <Styles />
+            <Component {...pageProps} />
+         </AuthProvider>
+      </ThemeProvider>
+   )
+}
+
+const Styles: FC = () => {
+   const { bg, text } = useTheme()
+   return (
+      <Global
+         styles={css`
                body {
                   font-family: sans-serif;
-                  background: #3e4247;
-                  color: #eee;
+                  background: ${bg};
+                  color: ${text};
                }
 
                ul {
@@ -26,9 +47,7 @@ const App: AppComponent = ({ Component, pageProps }) => {
 
                ${scrollbar}
             `}
-         />
-         <Component {...pageProps} />
-      </Provider>
+      />
    )
 }
 

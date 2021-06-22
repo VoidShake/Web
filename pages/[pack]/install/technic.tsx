@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
 import Image from 'next/image'
+import { darken } from 'polished'
 import { FC } from 'react'
 import Copy from '../../../components/Copy'
 import Layout from '../../../components/Layout'
@@ -85,9 +86,7 @@ const Mark = styled.p`
    font-size: 1.8rem;
    width: 2.9rem;
    padding: 0.4rem;
-   background: #EEE;
-   background: #2f3336;
-   //color: black;
+   background: ${p => darken(0.05, p.theme.bg)};
    border-radius: 9999px;
    position: absolute;
    left: 1rem;
