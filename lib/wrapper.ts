@@ -22,3 +22,16 @@ export default function wrapper(handler: AuthenticatedApiHandler): NextApiHandle
       return handler(req, res, session)
    }
 }
+
+type Method = 'post' | 'get' | 'put' | 'delete' | 'head'
+export function methodSwitch(handlers: Partial<Record<Method, NextApiHandler>>): NextApiHandler {
+   return (req, res) => {
+      const handler = (handlers as Record<string, NextApiHandler | undefined>)[req.method?.toLowerCase() ?? '']
+      if (handler) return handler(req, res)
+      throw new ApiError(404, 'Invalid Method')
+   }
+}
+
+export function forMethod(method: Method, handler: NextApiHandler) {
+   return methodSwitch({ [method]: handler })
+}

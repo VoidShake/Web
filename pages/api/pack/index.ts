@@ -1,24 +1,14 @@
 import Joi from 'joi'
-import { NextApiHandler } from 'next'
 import { ApiError } from 'next/dist/next-server/server/api-utils'
 import Pack from '../../../database/models/Pack'
 import { forwardTokenRequest } from '../../../lib/token'
 import validate from '../../../lib/validate'
-import wrapper from '../../../lib/wrapper'
+import wrapper, { methodSwitch } from '../../../lib/wrapper'
 import updateHandler from './[id]'
 
-const handler: NextApiHandler = (req, res) => {
+const put = forwardTokenRequest(updateHandler)
 
-   if (req.method === 'POST') return postRequest(req, res)
-   if (req.method === 'PUT') return putRequest(req, res)
-
-   res.status(400).send({ error: 'Invalid method' })
-
-}
-
-const putRequest = forwardTokenRequest(updateHandler)
-
-const postRequest = wrapper(async (req, res, session) => {
+const post = wrapper(async (req, res, session) => {
 
    validate(req, {
       body: {
@@ -34,4 +24,4 @@ const postRequest = wrapper(async (req, res, session) => {
 
 })
 
-export default handler
+export default methodSwitch({ post, put })
