@@ -21,39 +21,30 @@ const Page: FC<{
    to: IRelease
    pack: IPack
    versions: string[]
-   changes: Array<{ changelog: string, version: string }>
+   changes: Array<{ changelog: string; version: string }>
 }> = ({ from, to, pack, versions, changes }) => {
    const router = useRouter()
 
    const mods = useMemo(() => {
-
       const added = to.mods
          .filter(m1 => !from.mods.some(m2 => m2.cfID === m1.cfID))
          .map<VersionedMod>(m => ({ ...m, to: m.version }))
 
       const changed = from.mods.map<VersionedMod>(mod => ({
-         ...mod, from: mod.version,
+         ...mod,
+         from: mod.version,
          to: to.mods.find(m => m.cfID === mod.cfID)?.version,
       }))
 
       return [...changed, ...added]
-
    }, [from, to])
 
-   const lists = useMemo(() =>
-      Object.entries(groupBy(mods, m => getChange(m)))
-         .map(([c, l]) => [Number.parseInt(c), l] as [Change, VersionedMod[]]),
-      [mods]
-   )
+   const lists = useMemo(() => Object.entries(groupBy(mods, m => getChange(m))).map(([c, l]) => [Number.parseInt(c), l] as [Change, VersionedMod[]]), [mods])
 
-   const select = useCallback((h: { from?: string, to?: string }) =>
-      router.push(`/${pack.slug}/diff/${h.from ?? from.version}..${h.to ?? to.version}`),
-      [from, to]
-   )
+   const select = useCallback((h: { from?: string; to?: string }) => router.push(`/${pack.slug}/diff/${h.from ?? from.version}..${h.to ?? to.version}`), [from, to])
 
    return (
       <Layout title={`Comparison ${from.version} > ${to.version}`}>
-
          <Title subtitle={{ ...pack, link: `/${pack.slug}` }}>
             Comparing
             <Versions>
@@ -63,42 +54,35 @@ const Page: FC<{
             </Versions>
          </Title>
 
-         {from.version === to.version &&
-            <Center as='h3'>Select two different versions</Center>
-         }
+         {from.version === to.version && <Center as='h3'>Select two different versions</Center>}
 
          <Changes>
-            {changes.map(({ changelog, version }) =>
-               <div key={version}>{
-                  changelog.split('\n').map((line, i) =>
+            {changes.map(({ changelog, version }) => (
+               <div key={version}>
+                  {changelog.split('\n').map((line, i) => (
                      <p key={`${version}-${i}`}>{line}</p>
-                  )
-               }</div>
-            )}
+                  ))}
+               </div>
+            ))}
          </Changes>
 
          <Line />
 
          <Stats>
-            {lists.map(([change, list]) =>
+            {lists.map(([change, list]) => (
                <Stat change={change} key={change}>
                   {list.length} mod{list.length === 1 ? '' : 's'} {Change[change]}
                </Stat>
-            )}
+            ))}
          </Stats>
 
-         {lists.map(([change, list]) =>
-            <MinifiedList
-               object={`${Change[change]} mod`}
-               minified={change === Change.unchanged}
-               toggleable={change === Change.unchanged}
-               key={change}>
-               {list.map(mod =>
+         {lists.map(([change, list]) => (
+            <MinifiedList object={`${Change[change]} mod`} minified={change === Change.unchanged} toggleable={change === Change.unchanged} key={change}>
+               {list.map(mod => (
                   <ModLine key={mod.cfID} {...mod} />
-               )}
+               ))}
             </MinifiedList>
-         )}
-
+         ))}
       </Layout>
    )
 }
@@ -106,7 +90,7 @@ const Page: FC<{
 const Changes = styled.div`
    gap: 1rem;
    padding: 1rem 100px;
-   
+
    display: flex;
    flex-direction: column;
    flex-wrap: wrap;
@@ -157,13 +141,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    const releases = await Release.find({ pack: pack._id }, { version: true }, { sort: { date: -1 } })
 
-   const matches = await Promise.all(versions.map(v =>
-      Release.findOne(
-         { pack: pack._id, version: v === 'current' ? { $exists: true } : v },
-         undefined,
-         { sort: { date: -1 } }
-      )
-   ))
+   const matches = await Promise.all(versions.map(v => Release.findOne({ pack: pack._id, version: v === 'current' ? { $exists: true } : v }, undefined, { sort: { date: -1 } })))
 
    if (matches.length === 1 && matches[0]) {
       matches.unshift(await Release.findOne({ pack: pack._id, date: { $lt: matches[0].date } }, undefined, { sort: { date: -1 } }))
@@ -173,15 +151,12 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
    if (!from || !to) return { notFound: true }
 
-   const changes = await Release.find(
-      { pack: pack._id, date: { $gte: from.date, $lt: to.date } },
-      { changelog: true, version: true },
-      { sort: { date: -1 } }
-   )
+   const changes = await Release.find({ pack: pack._id, date: { $gte: from.date, $lt: to.date } }, { changelog: true, version: true }, { sort: { date: -1 } })
 
    return {
       props: {
-         from, to,
+         from,
+         to,
          pack: serialize(pack),
          changes: serialize(changes),
          versions: releases.map(it => it.version),

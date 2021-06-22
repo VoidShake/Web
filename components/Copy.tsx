@@ -1,8 +1,8 @@
-import styled from "@emotion/styled"
-import { Copy as Icon } from "@styled-icons/fa-solid"
-import { invert } from "polished"
-import { FC, useCallback, useEffect, useMemo, useState } from "react"
-import useTooltip from "./hooks/useTooltip"
+import styled from '@emotion/styled'
+import { Copy as Icon } from '@styled-icons/fa-solid'
+import { invert } from 'polished'
+import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import useTooltip from './hooks/useTooltip'
 
 const Text = styled.button`
    text-decoration: underline;
@@ -24,17 +24,16 @@ const Text = styled.button`
       cursor: copy;
    }
 
-   transform: scale(1.0);
+   transform: scale(1);
    &:active {
       transform: scale(1.2);
    }
 `
 
 const Copy: FC<{
-   content?: string,
-   children: string,
+   content?: string
+   children: string
 }> = ({ content, children }) => {
-
    const [justCopied, setJustCopied] = useState(false)
    const copyText = useMemo(() => content ?? children, [content, children])
 
@@ -50,11 +49,13 @@ const Copy: FC<{
 
    const tooltip = useTooltip(`copy-${copyText}`, { event: 'click', eventOff: 'mouseleave', afterShow: click })
 
-   return <Text data-tip='Copied' data-for={`copy-${copyText}`} onClick={click}>
-      <span>{children}</span>
-      <Icon size='1rem' />
-      {tooltip}
-   </Text>
+   return (
+      <Text data-tip='Copied' data-for={`copy-${copyText}`} onClick={click}>
+         <span>{children}</span>
+         <Icon size='1rem' />
+         {tooltip}
+      </Text>
+   )
 }
 
 export default Copy

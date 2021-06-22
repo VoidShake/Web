@@ -11,7 +11,6 @@ type RequestSchema = {
 }
 
 export default function validate(req: NextApiRequest, schema: RequestSchema, additionalOptions?: ValidationOptions) {
-
    const options: ValidationOptions = {
       stripUnknown: true,
       ...additionalOptions,
@@ -27,10 +26,10 @@ export default function validate(req: NextApiRequest, schema: RequestSchema, add
    if (error) {
       throw new ApiError(400, error.message)
    } else {
-
-      Object.keys(schema).map(k => k as SchemaKey).forEach((key, i) => {
-         req[key] = results[i].value
-      })
-
+      Object.keys(schema)
+         .map(k => k as SchemaKey)
+         .forEach((key, i) => {
+            req[key] = results[i].value
+         })
    }
 }

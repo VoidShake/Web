@@ -21,23 +21,23 @@ const Styles: FC = () => {
    return (
       <Global
          styles={css`
-               body {
-                  font-family: sans-serif;
-                  background: ${bg};
-                  color: ${text};
-               }
+            body {
+               font-family: sans-serif;
+               background: ${bg};
+               color: ${text};
+            }
 
-               ul {
-                  list-style: none;
-               }
+            ul {
+               list-style: none;
+            }
 
-               img {
-                  width: 100%;
-                  object-fit: contain;
-               }
+            img {
+               width: 100%;
+               object-fit: contain;
+            }
 
-               ${scrollbar}
-            `}
+            ${scrollbar}
+         `}
       />
    )
 }

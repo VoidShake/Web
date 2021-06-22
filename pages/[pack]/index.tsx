@@ -69,13 +69,14 @@ const Page: FC<{
 
          <Title noline>
             {name} {version && <Version>({version})</Version>}
-
             <Subtitle>
-               {subtitles.map(([link, text, icon]) =>
+               {subtitles.map(([link, text, icon]) => (
                   <Link key={link} href={link}>
-                     <SubtitleLink>{text} {createElement(icon, { size: 20 })}</SubtitleLink>
+                     <SubtitleLink>
+                        {text} {createElement(icon, { size: 20 })}
+                     </SubtitleLink>
                   </Link>
-               )}
+               ))}
             </Subtitle>
          </Title>
 
@@ -139,7 +140,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
             foreignField: 'pack',
             as: 'pages',
          },
-      }
+      },
    ])
 
    if (!pack) return { notFound: true }
@@ -163,7 +164,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
                         $in: ['$$slug', '$mods.slug'],
                      },
                   },
-               }
+               },
             ],
             as: 'mods.pages',
          },

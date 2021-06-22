@@ -1,19 +1,17 @@
-import styled from "@emotion/styled";
-import { DateTime } from "luxon";
-import { useRouter } from 'next/router';
-import { invert, lighten } from "polished";
-import { FC, useMemo } from "react";
-import Link from '../components/Link';
-import { IRelease } from "../database/models/Release";
+import styled from '@emotion/styled'
+import { DateTime } from 'luxon'
+import { useRouter } from 'next/router'
+import { invert, lighten } from 'polished'
+import { FC, useMemo } from 'react'
+import Link from '../components/Link'
+import { IRelease } from '../database/models/Release'
 
 const Release: FC<IRelease> = ({ version, name, changelog, date, children }) => {
-
    const time = useMemo(() => DateTime.fromISO(date), [date])
    const { query } = useRouter()
 
    return (
       <Container>
-
          <Link href={`/${query.pack}?version=${version}`}>
             <h2>{name ?? `Version ${version}`}</h2>
          </Link>
@@ -31,13 +29,12 @@ const Release: FC<IRelease> = ({ version, name, changelog, date, children }) => 
          </Buttons>
 
          <Changelog>
-            {changelog.split('\n').map((line, i) =>
+            {changelog.split('\n').map((line, i) => (
                <p key={i}>{line}</p>
-            )}
+            ))}
          </Changelog>
 
          {children}
-
       </Container>
    )
 }
@@ -88,7 +85,8 @@ const Container = styled.li`
    &:hover {
       background: ${p => p.theme.secondary};
       outline-width: 0;
-      &, > a {
+      &,
+      > a {
          color: ${p => invert(p.theme.text)};
       }
 
@@ -99,9 +97,9 @@ const Container = styled.li`
 
    display: grid;
    grid-template:
-      "name labels"
-      "changelog changelog"
-      "buttons buttons"
+      'name labels'
+      'changelog changelog'
+      'buttons buttons'
       / 1fr 1fr;
 
    row-gap: 2rem;

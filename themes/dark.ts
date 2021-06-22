@@ -1,4 +1,4 @@
-import { Theme } from "@emotion/react";
+import { Theme } from '@emotion/react'
 
 const theme: Theme = {
    bg: '#3e4247',

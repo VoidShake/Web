@@ -1,14 +1,17 @@
-import { NextApiHandler } from 'next'
+import Joi from 'joi'
 import { sendFile } from '../../../../../lib/storage'
+import validate from '../../../../../lib/validate'
+import { forMethod } from '../../../../../lib/wrapper'
 
-const handler: NextApiHandler = async (req, res) => {
-   const { id, file } = req.query
+export default forMethod('get', async (req, res) => {
+   validate(req, {
+      query: {
+         id: Joi.string().required(),
+         file: Joi.string().required(),
+      },
+   })
 
-   if (req.method === 'GET') {
-      return sendFile(res, 'packs', id?.toString(), file?.toString())
-   }
+   const { id, file } = req.query as Record<string, string>
 
-   res.status(400).send({ error: 'Invalid method' })
-}
-
-export default handler
+   return sendFile(res, 'packs', id, file)
+})

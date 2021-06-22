@@ -1,16 +1,18 @@
-import styled from "@emotion/styled";
-import { createContext, createRef, FC, MutableRefObject, useContext, useMemo, useRef } from "react";
-import { createPortal } from "react-dom";
+import styled from '@emotion/styled'
+import { createContext, createRef, FC, MutableRefObject, useContext, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 const context = createContext<MutableRefObject<HTMLDivElement | null>>(createRef())
 
 const Timeline: FC = ({ children }) => {
    const ref = useRef<HTMLDivElement | null>(null)
 
-   return <context.Provider value={ref}>
-      <Line ref={ref} />
-      {children}
-   </context.Provider>
+   return (
+      <context.Provider value={ref}>
+         <Line ref={ref} />
+         {children}
+      </context.Provider>
+   )
 }
 
 export const TimelineDot: FC = () => {
@@ -18,14 +20,16 @@ export const TimelineDot: FC = () => {
    const line = useContext(context)
    const top = useMemo(() => {
       const reference = ref.current?.parentElement
-      if (reference && line.current) return reference.offsetTop + (reference.offsetHeight / 2) - line.current.offsetTop
+      if (reference && line.current) return reference.offsetTop + reference.offsetHeight / 2 - line.current.offsetTop
       return 0
    }, [ref.current, line.current])
 
-   return <>
-      <Ref ref={ref} />
-      {line.current && createPortal(<Dot top={top} />, line.current)}
-   </>
+   return (
+      <>
+         <Ref ref={ref} />
+         {line.current && createPortal(<Dot top={top} />, line.current)}
+      </>
+   )
 }
 
 const Ref = styled.div`
@@ -34,7 +38,7 @@ const Ref = styled.div`
 
 const Line = styled.div`
    position: absolute;
-   background: linear-gradient(transparent, #BBB 4rem, ${p => p.theme.secondary} calc(100% - 4rem), transparent);
+   background: linear-gradient(transparent, #bbb 4rem, ${p => p.theme.secondary} calc(100% - 4rem), transparent);
    width: 2px;
    height: calc(100% - 4rem);
    margin: 0 auto;

@@ -29,7 +29,7 @@ export function save(file: File, ...location: string[]) {
 }
 
 export function sendFile(res: NextApiResponse, ...location: string[]) {
-   if(!exists(...location)) throw new ApiError(404, 'File not found')
+   if (!exists(...location)) throw new ApiError(404, 'File not found')
    const path = getPath(...location)
    const ext = extname(path).substring(1)
    const { size } = statSync(path)

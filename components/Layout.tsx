@@ -30,11 +30,10 @@ const Layout: FC<{
          <link rel='manifest' href='/manifest.json' />
       </Head>
       <Navbar />
-      
+
       {children}
 
       <Footer />
-
    </Style>
 )
 

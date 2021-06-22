@@ -6,12 +6,20 @@ import Link from './Link'
 const Footer: FC = () => {
    const [session] = useSession()
 
-   return <Style>
-      {session?.user
-         ? <p>Logged in as <Link underline='hover' href='/profile'>{session.user.name}</Link></p>
-         : <Link href='/api/auth/signin'>Login</Link>
-      }
-   </Style>
+   return (
+      <Style>
+         {session?.user ? (
+            <p>
+               Logged in as{' '}
+               <Link underline='hover' href='/profile'>
+                  {session.user.name}
+               </Link>
+            </p>
+         ) : (
+            <Link href='/api/auth/signin'>Login</Link>
+         )}
+      </Style>
+   )
 }
 
 const Style = styled.footer`

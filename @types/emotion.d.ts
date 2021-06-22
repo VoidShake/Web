@@ -1,7 +1,6 @@
-import '@emotion/react';
+import '@emotion/react'
 
 declare module '@emotion/react' {
-
    export interface Theme {
       bg: string
       text: string
@@ -10,5 +9,4 @@ declare module '@emotion/react' {
       tooltip: string
       darker: number
    }
-
 }

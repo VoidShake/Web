@@ -1,17 +1,11 @@
 import Joi from 'joi'
-import { ApiError } from 'next/dist/next-server/server/api-utils'
-import Pack from '../../../../database/models/Pack'
-import { authorized } from '../../../../lib/token'
+import { authorizedPack } from '../../../../lib/token'
 import validate from '../../../../lib/validate'
-import wrapper from '../../../../lib/wrapper'
+import withSession, { forMethod } from '../../../../lib/wrapper'
 
-const handler = wrapper(async (req, res, session) => {
-
-   if (req.method === 'PUT') {
-
-      const id = req.query.id as string
-      await authorized(session, id)
-
+export default forMethod(
+   'put',
+   withSession(async (req, res, session) => {
       validate(req, {
          query: {
             id: Joi.string().required(),
@@ -19,18 +13,16 @@ const handler = wrapper(async (req, res, session) => {
          body: {
             name: Joi.string().optional(),
             description: Joi.string().optional(),
-            links: Joi.object().pattern(/^/, Joi.string())
+            links: Joi.object().pattern(/^/, Joi.string()),
          },
       })
 
-      const updated = await Pack.findByIdAndUpdate(id, req.body)
-      if (!updated) throw new ApiError(404, 'Pack not found')
+      const id = req.query.id as string
+      const pack = await authorizedPack(session, id)
+      
+      Object.assign(pack, req.body)
+      const updated = await pack.save()
 
       return res.json(updated)
-   }
-
-   res.status(400).send({ error: 'Invalid method' })
-}
+   })
 )
-
-export default handler

@@ -1,5 +1,5 @@
-import { Schema } from "mongoose";
-import { IPage } from "./Page";
+import { Schema } from 'mongoose'
+import { IPage } from './Page'
 
 export interface IMod {
    cfID: number
@@ -46,16 +46,18 @@ const schema = new Schema({
    },
    icon: String,
    popularityScore: Number,
-   categories: [new Schema({
-      categoryId: { type: Number, required: true },
-      name: { type: String, required: true },
-      url: { type: String, required: true },
-      avatarUrl: { type: String, required: true },
-   })],
+   categories: [
+      new Schema({
+         categoryId: { type: Number, required: true },
+         name: { type: String, required: true },
+         url: { type: String, required: true },
+         avatarUrl: { type: String, required: true },
+      }),
+   ],
    version: new Schema({
       date: { type: String, required: true },
       file: { type: String, required: true },
-   })
+   }),
 })
 
 export default schema

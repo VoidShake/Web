@@ -1,8 +1,8 @@
-import { ObjectId } from "mongodb";
-import Mongoose, { Schema } from "mongoose";
-import { define } from "..";
-import Model from "./Base";
-import Mod, { IMod } from "./Mod";
+import { ObjectId } from 'mongodb'
+import Mongoose, { Schema } from 'mongoose'
+import { define } from '..'
+import Model from './Base'
+import Mod, { IMod } from './Mod'
 
 export interface IRelease extends Model {
    pack: ObjectId

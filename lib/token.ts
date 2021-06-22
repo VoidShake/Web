@@ -1,9 +1,9 @@
-import jwt from 'jsonwebtoken';
-import { NextApiHandler, NextApiRequest } from "next";
-import { Session } from "next-auth";
-import { ApiError } from "next/dist/next-server/server/api-utils";
-import Pack from "../database/models/Pack";
-import wrapper, { AuthenticatedApiHandler } from './wrapper';
+import jwt from 'jsonwebtoken'
+import { NextApiHandler, NextApiRequest } from 'next'
+import { Session } from 'next-auth'
+import { ApiError } from 'next/dist/next-server/server/api-utils'
+import Pack from '../database/models/Pack'
+import withSession, { AuthenticatedApiHandler } from './wrapper'
 
 const KEY = process.env.JWT_SECRET
 
@@ -12,22 +12,31 @@ export interface Token {
    created: number
 }
 
-export async function isAuthorized(session: Session | undefined | null, packId: string) {
-   if (session?.packToken) return packId === session.packToken.pack
+export async function getAuthorizedPack(session: Session | undefined | null, packId: string) {
+   if (!session) return false
+   
    const pack = await Pack.findById(packId)
-   return pack && session && session.user?.email === pack.author
+   if (!pack) throw new ApiError(404, 'Pack not found')
+
+   if (pack.id === session.packToken?.pack) return pack
+   if (session.user?.email === pack.author) return pack
+   return false
 }
 
-export async function authorized(session: Session | undefined | null, packId: string) {
-   if (!await isAuthorized(session, packId)) throw new ApiError(403, 'Unauthorized')
+export async function authorizedPack(session: Session | undefined | null, packId: string) {
+   const pack = await getAuthorizedPack(session, packId)
+   if (!pack) throw new ApiError(403, 'Unauthorized')
+   return pack
 }
 
+/*
 export async function getPack(session?: Session) {
    if (!session?.packToken) throw new ApiError(403, 'Only accessible using a pack token')
    const pack = await Pack.findById(session.packToken.pack)
    if (!pack) throw new ApiError(404, 'Pack not found')
    return pack
 }
+*/
 
 export function createToken(pack: string) {
    if (!KEY) throw new ApiError(500, 'No JWT Secret defined')
@@ -53,7 +62,7 @@ export function tokenSession(req: NextApiRequest): Session | null {
 }
 
 export function forwardTokenRequest(handler: AuthenticatedApiHandler, key = 'id'): NextApiHandler {
-   return wrapper((req, res, session) => {
+   return withSession((req, res, session) => {
       if (!session.packToken) throw new ApiError(403, 'Pack token required')
       req.query[key] = session.packToken.pack
       return handler(req, res, session)

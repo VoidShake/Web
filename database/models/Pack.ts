@@ -1,8 +1,8 @@
-import { Schema } from "mongoose";
-import slugify from "slugify";
-import { define } from "../index";
-import Model from "./Base";
-import { IPage } from "./Page";
+import { Schema } from 'mongoose'
+import slugify from 'slugify'
+import { define } from '../index'
+import Model from './Base'
+import { IPage } from './Page'
 
 export interface IPack extends Model {
    name: string
@@ -22,7 +22,7 @@ const schema = new Schema({
    },
    author: {
       type: String,
-      required: true
+      required: true,
    },
    description: String,
    slug: String,

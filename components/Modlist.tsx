@@ -77,8 +77,8 @@ const Category = styled.li<{ selected?: boolean }>`
    ${p =>
       p.selected &&
       css`
-      background: ${p.theme.secondary};
-      color: ${invert(p.theme.text)};
+         background: ${p.theme.secondary};
+         color: ${invert(p.theme.text)};
       `}
 
    &:hover {

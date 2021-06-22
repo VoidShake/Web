@@ -5,9 +5,10 @@ import { useSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import { invert } from 'polished'
 import { createElement, FC, useEffect } from 'react'
+import { LinkButton as Link } from '../components/Button'
 import useSettings from '../components/hooks/useSettings'
+import useTooltip from '../components/hooks/useTooltip'
 import Layout from '../components/Layout'
-import Link from '../components/LinkButton'
 import Title from '../components/Title'
 
 const Page: FC = () => {
@@ -22,33 +23,30 @@ const Page: FC = () => {
       <Layout>
          <Title>Profile</Title>
 
-         {session?.user
-            ? <Profile {...session.user} />
-            : <p>You are not logged in</p>
-         }
-
+         {session?.user ? <Profile {...session.user} /> : <p>You are not logged in</p>}
       </Layout>
    )
 }
 
 const Profile: FC<Session['user']> = ({ name, email, image }) => {
    const [{ dark }, modify] = useSettings()
+   const tooltip = useTooltip('profile')
 
    return (
       <Style>
+         {tooltip}
          <img src={image} alt={name} />
 
          <h2>{name}</h2>
          <p>{email}</p>
 
          <Buttons>
-            <button onClick={() => modify({ dark: !dark })}>
+            <button data-for='profile' data-tip={`Use ${dark ? 'light' : 'dark'} mode`} onClick={() => modify({ dark: !dark })}>
                {createElement(dark ? Sun : Moon, { size: '2rem' })}
             </button>
          </Buttons>
 
          <Link href='/api/auth/signout'>Logout</Link>
-
       </Style>
    )
 }
@@ -65,9 +63,10 @@ const Buttons = styled.ul`
 `
 
 const Style = styled.section`
-   margin-left: -500px;
    display: grid;
    justify-content: center;
+   width: fit-content;
+   margin: 0 auto;
 
    column-gap: 100px;
    row-gap: 1rem;
@@ -77,16 +76,17 @@ const Style = styled.section`
       grid-area: logout;
    }
 
-   grid-template: 
-      "icon name buttons"
-      "icon email buttons"
-      "icon . buttons"
-      "icon logout buttons";
+   grid-template:
+      'icon name buttons'
+      'icon email buttons'
+      'icon . buttons'
+      'icon logout buttons'
+      / 1fr auto 1fr;
 
    img {
       clip-path: circle(50% at 50% 50%);
       grid-area: icon;
-      width: 400px;
+      width: 300px;
       max-width: 20vw;
    }
 `

@@ -17,7 +17,6 @@ const Page: FC<{
    assets: IPack['assets']
    releases: IRelease[]
 }> = ({ name, assets, releases, slug }) => {
-
    const tooltip = useTooltip('release')
 
    return (
@@ -32,14 +31,13 @@ const Page: FC<{
 
          <Releases>
             <Timeline>
-               {releases?.map(r =>
+               {releases?.map(r => (
                   <Release key={r.version} {...r}>
                      <TimelineDot />
                   </Release>
-               )}
+               ))}
             </Timeline>
          </Releases>
-
       </Layout>
    )
 }

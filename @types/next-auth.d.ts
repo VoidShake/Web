@@ -1,8 +1,7 @@
-import 'next-auth/jwt';
-import { Token } from '../lib/token';
+import 'next-auth/jwt'
+import { Token } from '../lib/token'
 
 declare module 'next-auth' {
-
    export interface Session {
       user?: {
          name: string
@@ -12,5 +11,4 @@ declare module 'next-auth' {
       packToken?: Token
       expires?: string
    }
-
 }

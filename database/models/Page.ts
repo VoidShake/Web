@@ -1,6 +1,6 @@
-import Mongoose, { Schema } from "mongoose";
-import { define } from "..";
-import Model from "./Base";
+import Mongoose, { Schema } from 'mongoose'
+import { define } from '..'
+import Model from './Base'
 
 export interface ModReference {
    slug: string
@@ -33,14 +33,18 @@ const schema = new Schema({
       type: String,
       required: true,
    },
-   mods: [new Schema({
-      slug: { type: String, required: true },
-      relevance: { type: String, required: true },
-   })],
-   content: [new Schema({
-      text: String,
-      image: String,
-   })]
+   mods: [
+      new Schema({
+         slug: { type: String, required: true },
+         relevance: { type: String, required: true },
+      }),
+   ],
+   content: [
+      new Schema({
+         text: String,
+         image: String,
+      }),
+   ],
 })
 
 export default define<IPage>('Page', schema)

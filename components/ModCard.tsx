@@ -65,25 +65,31 @@ const Lib = styled.span`
    border-radius: 99999px;
 `
 
-const Card = styled.div<{ glow?: boolean; fade?: boolean, scheme?: Scheme }>`
+const Card = styled.div<{ glow?: boolean; fade?: boolean; scheme?: Scheme }>`
    position: relative;
    text-align: center;
 
    background: ${p => darken(p.theme.darker, p.theme.bg)};
    color: ${p => p.theme.text};
 
-   ${p => p.scheme === 'highlighted' && css`
-      background: ${p.theme.secondary};
-      color: ${invert(p.theme.text)};
-   `}
+   ${p =>
+      p.scheme === 'highlighted' &&
+      css`
+         background: ${p.theme.secondary};
+         color: ${invert(p.theme.text)};
+      `}
 
-   ${p => p.scheme === 'library' && css`
-      background: '#559aed77';
-   `}
+   ${p =>
+      p.scheme === 'library' &&
+      css`
+         background: '#559aed77';
+      `}
 
-   ${p => p.scheme === 'major' && css`
-      background: ${p.theme.primary};
-   `}
+   ${p =>
+      p.scheme === 'major' &&
+      css`
+         background: ${p.theme.primary};
+      `}
 
    opacity: ${p => (p.fade ? 0.2 : 1)};
 

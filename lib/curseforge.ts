@@ -1,4 +1,4 @@
-import { IMod } from "../database/models/Mod"
+import { IMod } from '../database/models/Mod'
 
 const BASE_URL = 'https://addons-ecs.forgesvc.net/api/v2'
 
