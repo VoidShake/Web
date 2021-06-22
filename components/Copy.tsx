@@ -20,7 +20,7 @@ const Text = styled.button`
 
    &:hover {
       background: ${p => p.theme.secondary};
-      color: ${p => invert(p.theme.secondary)};
+      color: ${p => invert(p.theme.text)};
       cursor: copy;
    }
 

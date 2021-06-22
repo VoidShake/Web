@@ -1,3 +1,4 @@
+import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/client'
 import { FC } from 'react'
@@ -8,7 +9,7 @@ import database, { serialize } from '../../database'
 import Pack, { IPack } from '../../database/models/Pack'
 import { createToken, isAuthorized } from '../../lib/token'
 
-const PackSettings: FC<IPack & {
+const Page: FC<IPack & {
    token: string
 }> = ({ name, description, slug, assets, token }) => {
 
@@ -17,11 +18,19 @@ const PackSettings: FC<IPack & {
 
          <Title subtitle={{ link: `/${slug}`, name }}>Settings</Title>
 
-         <Copy content={token}>Copy Token</Copy>
+         <Content>
+            <Copy content={token}>Copy Token</Copy>
+         </Content>
 
       </Layout>
    )
 }
+
+const Content = styled.div`
+   margin: 0 auto;
+   width: fit-content;
+   font-size: 2rem;
+`
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
    await database()
@@ -38,4 +47,4 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
    return { props: { ...serialize(pack), token } }
 }
 
-export default PackSettings
+export default Page

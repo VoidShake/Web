@@ -7,8 +7,8 @@ const Footer: FC = () => {
    const [session] = useSession()
 
    return <Style>
-      {session
-         ? <p>Logged in as <b>{session.user?.name}</b></p>
+      {session?.user
+         ? <p>Logged in as <Link underline='hover' href='/profile'>{session.user.name}</Link></p>
          : <Link href='/api/auth/signin'>Login</Link>
       }
    </Style>

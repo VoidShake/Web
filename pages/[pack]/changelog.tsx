@@ -11,7 +11,7 @@ import database, { serialize } from '../../database'
 import Pack, { IPack } from '../../database/models/Pack'
 import { IRelease } from '../../database/models/Release'
 
-const PackView: FC<{
+const Page: FC<{
    name: string
    slug: string
    assets: IPack['assets']
@@ -85,4 +85,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    return { props: serialize(pack) }
 }
 
-export default PackView
+export default Page

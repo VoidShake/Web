@@ -24,11 +24,11 @@ const Style = styled.select`
    transition: background 0.1s ease;
    
    &:hover {
-      background: ${p => darken(0.05, p.theme.bg)};
+      background: ${p => darken(p.theme.darker, p.theme.bg)};
    }
 
    option {
-      background: ${p => darken(0.05, p.theme.bg)};
+      background: ${p => darken(p.theme.darker, p.theme.bg)};
    }
 `
 

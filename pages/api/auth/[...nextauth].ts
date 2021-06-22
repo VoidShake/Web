@@ -9,6 +9,6 @@ export default NextAuth({
     }),
   ],
   jwt: {
-     signingKey: process.env.JWT_PRIVATE_KEY,
-  },
+    signingKey: process.env.JWT_PRIVATE_KEY,
+  }
 })

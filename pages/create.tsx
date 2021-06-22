@@ -7,7 +7,7 @@ import Layout from '../components/Layout'
 import Title from '../components/Title'
 import { IPack } from '../database/models/Pack'
 
-const Create: FC = () => {
+const Page: FC = () => {
    const [session] = useSession()
 
    return (
@@ -46,4 +46,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
 }
 */
 
-export default Create
+export default Page

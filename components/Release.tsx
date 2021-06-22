@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import { DateTime } from "luxon";
 import { useRouter } from 'next/router';
-import { invert } from "polished";
+import { invert, lighten } from "polished";
 import { FC, useMemo } from "react";
 import Link from '../components/Link';
 import { IRelease } from "../database/models/Release";
@@ -12,69 +12,97 @@ const Release: FC<IRelease> = ({ version, name, changelog, date, children }) => 
    const { query } = useRouter()
 
    return (
-      <Link href={`/${query.pack}?version=${version}`}>
-         <Container>
+      <Container>
 
+         <Link href={`/${query.pack}?version=${version}`}>
             <h2>{name ?? `Version ${version}`}</h2>
+         </Link>
 
-            <Labels>
-               <Time data-tip={time.toLocaleString()} data-for='release'>{time.toRelative()}</Time>
-               <Link href={`/${query.pack}/diff/${version}..current`}>
-                  <span data-tip='Compare with current version' data-for='release'>Diff</span>
-               </Link>
-            </Labels>
+         <Time data-tip={time.toLocaleString()} data-for='release'>
+            {time.toRelative()}
+         </Time>
 
-            <Changelog>
-               {changelog.split('\n').map((line, i) =>
-                  <p key={i}>{line}</p>
-               )}
-            </Changelog>
+         <Buttons>
+            <Link href={`/${query.pack}/diff/${version}`}>
+               <More data-tip='Compare with current version' data-for='release'>
+                  More
+               </More>
+            </Link>
+         </Buttons>
 
-            {children}
+         <Changelog>
+            {changelog.split('\n').map((line, i) =>
+               <p key={i}>{line}</p>
+            )}
+         </Changelog>
 
-         </Container>
-      </Link>
+         {children}
+
+      </Container>
    )
 }
+
+const More = styled.span`
+   padding: 0.4rem 1rem;
+   border-radius: 9999px;
+
+   transition: background 0.1s ease;
+
+   &:hover {
+      background: ${p => lighten(0.2, p.theme.primary)} !important;
+   }
+`
 
 const Changelog = styled.div`
    grid-area: changelog;
 `
 
-const Labels = styled.div`
-   grid-area: labels;
-   > span {
-      color: black;
-      padding: 0.4rem 0.2rem;
-      text-align: center;
-      border-radius: 9999px;
-      cursor: help;
-   }
+const Buttons = styled.div`
+   grid-area: buttons;
+   display: grid;
+   grid-auto-flow: column;
+   justify-content: center;
+   gap: 0.5rem;
 `
 
 const Time = styled.span`
    background: #34caf0;
+   color: black;
+   cursor: help;
+   grid-area: labels;
+   padding: 0.4rem 0.6rem;
+   border-radius: 9999px;
+   justify-self: end;
 `
 
 const Container = styled.li`
+   position: relative;
    width: 600px;
    max-width: 100vw;
    padding: 2rem;
+   padding-bottom: 1rem;
 
    outline: #0003 solid 1px;
    transition: background 0.1s linear, outline 0.1s linear;
 
    &:hover {
       background: ${p => p.theme.secondary};
-      color: ${p => invert(p.theme.text)};
       outline-width: 0;
+      &, > a {
+         color: ${p => invert(p.theme.text)};
+      }
+
+      ${More} {
+         background: ${p => p.theme.primary};
+      }
    }
 
    display: grid;
    grid-template:
       "name labels"
       "changelog changelog"
-      / 2fr 1fr;
+      "buttons buttons"
+      / 1fr 1fr;
 
    row-gap: 2rem;
    align-items: center;

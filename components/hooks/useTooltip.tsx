@@ -1,3 +1,4 @@
+import { useTheme } from '@emotion/react'
 import { useEffect, useState } from 'react'
 import ReactTooltip, { TooltipProps } from 'react-tooltip'
 
@@ -9,7 +10,9 @@ export default function useTooltip(id: string, props: TooltipProps = {}) {
       return () => setMounted(false)
    })
 
-   const tooltip = <ReactTooltip id={id} backgroundColor='#000' insecure={false} effect='solid' {...props} />
+   const theme = useTheme()
+
+   const tooltip = <ReactTooltip id={id} backgroundColor={theme.tooltip} insecure={false} effect='solid' {...props} />
 
    return mounted ? tooltip : null
 }

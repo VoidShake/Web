@@ -1,6 +1,7 @@
 import { css, Theme } from '@emotion/react'
 import styled from '@emotion/styled'
 import { ArrowAltCircleRight, MinusCircle, PlusCircle } from '@styled-icons/fa-solid'
+import { darken } from 'polished'
 import { createElement, FC, useMemo } from 'react'
 import { IMod } from '../database/models/Mod'
 import { Left, Right } from './Text'
@@ -76,7 +77,7 @@ export const ChangeStyle = (p: { theme: Theme, change: Change }) => css`
    `}
 
    ${p.change === Change.unchanged && css`
-      background: #0002;
+      background: ${darken(p.theme.darker, p.theme.bg)};;
    `}
 `
 

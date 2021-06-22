@@ -7,6 +7,8 @@ declare module '@emotion/react' {
       text: string
       primary: string
       secondary: string
+      tooltip: string
+      darker: number
    }
 
 }

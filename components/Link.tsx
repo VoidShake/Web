@@ -9,7 +9,7 @@ interface StyleProps {
 
 const Style = styled.a<StyleProps>`
    text-decoration: ${p => (p.underline === 'always' ? 'underline' : 'none')};
-   color: #FFF;
+   color: ${p => p.theme.text};
    cursor: pointer;
 
    ${p =>

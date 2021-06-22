@@ -41,6 +41,7 @@ const Layout: FC<{
 const Style = styled.section`
    padding-bottom: 50px;
    position: relative;
+   min-height: 100vh;
 `
 
 export default Layout

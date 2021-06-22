@@ -1,6 +1,6 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
-import { darken, invert } from 'polished'
+import { darken, invert, mix, saturate } from 'polished'
 import { FC, useMemo } from 'react'
 import { IMod } from '../database/models/Mod'
 import InvisibleLink from './InvisibleLink'
@@ -39,15 +39,15 @@ const Info = styled.span`
    position: absolute;
    right: 0.3rem;
    top: 0.3rem;
-   background: #c7b769;
-   color: black;
+   background: ${p => saturate(0.5, mix(0.2, p.theme.text, p.theme.primary))};
+   color: ${p => invert(p.theme.text)};
    font-weight: bolder;
    padding: 0.1rem 0.7rem;
    border-radius: 99999px;
    transition: background 0.1s linear;
 
    &:hover {
-      background: #eddd93;
+      background: ${p => mix(0.4, p.theme.text, p.theme.primary)};
    }
 
    &::after {
@@ -69,7 +69,7 @@ const Card = styled.div<{ glow?: boolean; fade?: boolean, scheme?: Scheme }>`
    position: relative;
    text-align: center;
 
-   background: ${p => darken(0.05, p.theme.bg)};
+   background: ${p => darken(p.theme.darker, p.theme.bg)};
    color: ${p => p.theme.text};
 
    ${p => p.scheme === 'highlighted' && css`
@@ -90,8 +90,8 @@ const Card = styled.div<{ glow?: boolean; fade?: boolean, scheme?: Scheme }>`
    ${p =>
       p.glow &&
       css`
-         outline: 2px solid #eddd93;
-         box-shadow: 0 0 5px 0 #eddd93;
+         outline: 2px solid ${mix(0.4, p.theme.text, p.theme.primary)};
+         box-shadow: 0 0 5px 0 ${mix(0.4, p.theme.text, p.theme.primary)};
       `}
 
    transform: translateY(0);
@@ -115,7 +115,7 @@ const Card = styled.div<{ glow?: boolean; fade?: boolean, scheme?: Scheme }>`
    }
 
    img {
-      background: #0001;
+      background: ${p => darken(p.theme.darker * 2, p.theme.bg)};
       height: 200px;
    }
 `

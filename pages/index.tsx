@@ -8,7 +8,7 @@ import Title from '../components/Title'
 import database, { serialize } from '../database'
 import Pack, { IPack } from '../database/models/Pack'
 
-const Home: FC<{ packs: Partial<IPack>[] }> = ({ packs }) => (
+const Page: FC<{ packs: Partial<IPack>[] }> = ({ packs }) => (
    <Layout>
       <Title>Browse packs</Title>
 
@@ -49,4 +49,4 @@ export const getServerSideProps: GetServerSideProps = async () => {
    return { props: { packs: rawPacks.map(serialize) } }
 }
 
-export default Home
+export default Page

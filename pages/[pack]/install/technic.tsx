@@ -10,7 +10,7 @@ import Title from '../../../components/Title'
 import database, { serialize } from '../../../database'
 import Pack, { IPack } from '../../../database/models/Pack'
 
-const PackView: FC<IPack> = ({ name, assets, links, description, slug }) => {
+const Page: FC<IPack> = ({ name, assets, links, description, slug }) => {
    return (
       <Layout title={name} image={assets?.icon} description={description}>
 
@@ -86,7 +86,7 @@ const Mark = styled.p`
    font-size: 1.8rem;
    width: 2.9rem;
    padding: 0.4rem;
-   background: ${p => darken(0.05, p.theme.bg)};
+   background: ${p => darken(p.theme.darker, p.theme.bg)};
    border-radius: 9999px;
    position: absolute;
    left: 1rem;
@@ -134,7 +134,7 @@ const Steps = styled.ul`
       }
    
       &:hover {
-         background: #0002;
+         background: ${p => darken(p.theme.darker * 0.5, p.theme.bg)};
       }
    }
 `
@@ -160,4 +160,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    return { props: serialize(pack) }
 }
 
-export default PackView
+export default Page

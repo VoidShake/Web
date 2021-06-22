@@ -1,7 +1,9 @@
 import styled from '@emotion/styled'
-import { Clock, Download } from '@styled-icons/fa-solid'
+import { Clock, Cog, Download } from '@styled-icons/fa-solid'
+import { StyledIcon } from '@styled-icons/styled-icon'
 import { GetServerSideProps } from 'next'
-import { FC, useMemo, useState } from 'react'
+import { useSession } from 'next-auth/client'
+import { createElement, FC, useMemo, useState } from 'react'
 import Background from '../../components/Background'
 import Layout from '../../components/Layout'
 import Line from '../../components/Line'
@@ -14,7 +16,7 @@ import { IMod } from '../../database/models/Mod'
 import Pack, { IPack } from '../../database/models/Pack'
 import Release, { IRelease } from '../../database/models/Release'
 
-const PackView: FC<{
+const Page: FC<{
    mods: IMod[]
    name: string
    slug: string
@@ -23,7 +25,8 @@ const PackView: FC<{
    links: IPack['links']
    pages: LinkPage[]
    version?: string
-}> = ({ name, assets, links, description, version, slug, ...props }) => {
+   author: string
+}> = ({ name, assets, links, description, version, slug, author, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
@@ -45,7 +48,20 @@ const PackView: FC<{
       [props.mods, hoveredPage]
    )
 
+   const [session] = useSession()
+   const isAuthor = session?.user?.email === author
+
    const [download] = Object.entries(links ?? {})
+
+   const subtitles = useMemo(() => {
+      const subtitles: Array<[string, string, StyledIcon]> = []
+
+      if (download) subtitles.push([`/${slug}/install/${download[0]}`, 'Download', Download])
+      subtitles.push([`/${slug}/changelog`, 'Changelog', Clock])
+      if (isAuthor) subtitles.push([`/${slug}/settings`, 'Settings', Cog])
+
+      return subtitles
+   }, [download, isAuthor])
 
    return (
       <Layout title={name} image={assets?.icon} description={description}>
@@ -55,15 +71,11 @@ const PackView: FC<{
             {name} {version && <Version>({version})</Version>}
 
             <Subtitle>
-               {download &&
-                  <Link href={`/${slug}/install/${download[0]}`}>
-                     <Links> Download <Download size={20} /></Links>
+               {subtitles.map(([link, text, icon]) =>
+                  <Link key={link} href={link}>
+                     <SubtitleLink>{text} {createElement(icon, { size: 20 })}</SubtitleLink>
                   </Link>
-               }
-
-               <Link href={`/${slug}/changelog`}>
-                  <Links> Changelog <Clock size={20} /></Links>
-               </Link>
+               )}
             </Subtitle>
          </Title>
 
@@ -85,17 +97,20 @@ const Version = styled.span`
    position: absolute;
 `
 
-const Subtitle = styled.h2`
+const Subtitle = styled.p`
    margin-top: 0.5rem;
    font-size: 1.2rem;
    text-align: center;
    display: grid;
    grid-auto-flow: column;
    justify-content: space-around;
+   min-width: 100%;
+   width: fit-content;
 `
 
-const Links = styled.span`
+const SubtitleLink = styled.span`
    cursor: pointer;
+   margin: 0 1rem;
 
    &:hover {
       text-decoration: underline;
@@ -179,4 +194,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
    return { props: { ...serialize(pack), mods: serialize(mods), pages, version } }
 }
 
-export default PackView
+export default Page

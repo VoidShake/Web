@@ -23,10 +23,14 @@ export const TimelineDot: FC = () => {
    }, [ref.current, line.current])
 
    return <>
-      <div ref={ref} />
+      <Ref ref={ref} />
       {line.current && createPortal(<Dot top={top} />, line.current)}
    </>
 }
+
+const Ref = styled.div`
+   position: absolute;
+`
 
 const Line = styled.div`
    position: absolute;

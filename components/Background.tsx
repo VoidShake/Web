@@ -1,7 +1,7 @@
 import { css, Global } from '@emotion/react'
 import styled from '@emotion/styled'
 import { Eye } from '@styled-icons/fa-solid'
-import { FC, ImgHTMLAttributes, useState } from 'react'
+import { FC, ImgHTMLAttributes, useReducer, useState } from 'react'
 
 const Image = styled.img<{ blur: boolean; maximize: boolean, size?: number }>`
    position: absolute;
@@ -55,15 +55,16 @@ const Background: FC<ImgHTMLAttributes<HTMLImageElement> & {
 }> = props => {
    const [blur, setBlur] = useState(true)
    const [maximized, setMaximized] = useState(false)
+   const [failed, setFailed] = useReducer(() => true, false)
 
-   if(!props.src) return null
+   if (!props.src || failed) return null
 
    return (
       <>
          <Show title='Maximize background' onMouseOver={() => setBlur(false)} onMouseLeave={() => setBlur(true)} onClick={() => setMaximized(true)}>
             <Eye size={20} />
          </Show>
-         <Image maximize={maximized} blur={blur} {...props} onClick={() => setMaximized(false)} title={maximized ? 'Click close' : undefined} />
+         <Image onError={setFailed} maximize={maximized} blur={blur} {...props} onClick={() => setMaximized(false)} title={maximized ? 'Click close' : undefined} />
 
          {maximized && (
             <Global

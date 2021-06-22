@@ -1,26 +1,18 @@
-import { css, Global, Theme, ThemeProvider, useTheme } from '@emotion/react'
+import { css, Global, useTheme } from '@emotion/react'
 import { Provider as AuthProvider } from 'next-auth/client'
 import { AppComponent } from 'next/dist/next-server/lib/router/router'
-import React, { FC, useEffect, useReducer } from 'react'
+import React, { FC } from 'react'
+import { SettingsProvider } from '../components/hooks/useSettings'
 import '../style/reset.css'
-import dark from '../themes/dark'
-import light from '../themes/light'
 
 const App: AppComponent = ({ Component, pageProps }) => {
-   const [theme, toggleTheme] = useReducer((current: Theme) => current === dark ? light : dark, dark)
-
-   useEffect(() => {
-      window.addEventListener('keyup', toggleTheme)
-      return () => window.removeEventListener('keyup', toggleTheme)
-   }, [toggleTheme])
-
    return (
-      <ThemeProvider theme={theme}>
+      <SettingsProvider>
          <AuthProvider session={pageProps.session}>
             <Styles />
             <Component {...pageProps} />
          </AuthProvider>
-      </ThemeProvider>
+      </SettingsProvider>
    )
 }
 

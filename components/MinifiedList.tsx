@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { darken } from "polished";
 import { FC, ReactNodeArray, useEffect, useReducer, useRef } from "react";
 
 const MinifiedList: FC<{
@@ -45,7 +46,7 @@ const Toggle = styled.li<{ minified: boolean }>`
    top: 0;
    width: 100%;
    text-align: center;
-   background: #0001;
+   background: ${p => darken(p.theme.darker * 0.5, p.theme.bg)};
 
    padding: calc(${HIDDEN_SIZE / 2}px - 0.5rem) 0;
    user-select: none;

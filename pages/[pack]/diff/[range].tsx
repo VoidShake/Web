@@ -3,6 +3,7 @@ import { ArrowRight } from '@styled-icons/fa-solid'
 import { groupBy } from 'lodash'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
+import { darken } from 'polished'
 import { FC, useCallback, useMemo } from 'react'
 import Layout from '../../../components/Layout'
 import Line from '../../../components/Line'
@@ -15,7 +16,7 @@ import database, { serialize } from '../../../database'
 import Pack, { IPack } from '../../../database/models/Pack'
 import Release, { IRelease } from '../../../database/models/Release'
 
-const Diff: FC<{
+const Page: FC<{
    from: IRelease
    to: IRelease
    pack: IPack
@@ -53,7 +54,7 @@ const Diff: FC<{
    return (
       <Layout title={`Comparison ${from.version} > ${to.version}`}>
 
-         <Title  subtitle={{ ...pack, link: `/${pack.slug}` }}>
+         <Title subtitle={{ ...pack, link: `/${pack.slug}` }}>
             Comparing
             <Versions>
                <Select value={from.version} values={versions} onChange={from => select({ from })} />
@@ -103,18 +104,20 @@ const Diff: FC<{
 }
 
 const Changes = styled.div`
-   display: flex;
    gap: 1rem;
-   padding: 1rem;
-   //grid-template-columns: repeat(auto-fill, 600px);
-   justify-content: center;
+   padding: 1rem 100px;
+   
+   display: flex;
    flex-direction: column;
    flex-wrap: wrap;
+
    max-height: 600px;
+   width: fit-content;
 
    > div {
       padding: 1rem 1.5rem;
-      background: #0002;
+      background: ${p => darken(p.theme.darker, p.theme.bg)};
+      max-width: 600px;
    }
 `
 
@@ -163,7 +166,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    ))
 
    if (matches.length === 1 && matches[0]) {
-      matches.push(await Release.findOne({ date: { $gt: matches[0].date } }, undefined, { sort: { date: 1 } }))
+      matches.unshift(await Release.findOne({ pack: pack._id, date: { $lt: matches[0].date } }, undefined, { sort: { date: -1 } }))
    }
 
    const [from, to] = matches.map<IRelease>(serialize)
@@ -171,7 +174,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    if (!from || !to) return { notFound: true }
 
    const changes = await Release.find(
-      { date: { $gte: from.date, $lt: to.date }, changelog: { $exists: true } },
+      { pack: pack._id, date: { $gte: from.date, $lt: to.date } },
       { changelog: true, version: true },
       { sort: { date: -1 } }
    )
@@ -186,4 +189,4 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    }
 }
 
-export default Diff
+export default Page
