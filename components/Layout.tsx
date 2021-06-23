@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import Head from 'next/head'
 import React, { FC, ReactNode } from 'react'
 import Footer from './Footer'
+import { Portal } from './hooks/usePortal'
 import Navbar from './Navbar'
 
 const Layout: FC<{
@@ -29,6 +30,9 @@ const Layout: FC<{
 
          <link rel='manifest' href='/manifest.json' />
       </Head>
+
+      <Portal id='top' />
+
       <Navbar />
 
       {children}
@@ -36,6 +40,7 @@ const Layout: FC<{
       <Footer />
    </Style>
 )
+
 
 const Style = styled.section`
    padding-bottom: 50px;

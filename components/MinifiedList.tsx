@@ -8,7 +8,7 @@ const MinifiedList: FC<{
    object?: string
    children: ReactNodeArray
 }> = ({ children, object = 'element', toggleable = true, ...props }) => {
-   const [minified, toggle] = useReducer((b: boolean) => !b, !!props.minified)
+   const [minified, toggle] = useReducer(b => !b, !!props.minified)
    const ref = useRef<HTMLUListElement>(null)
 
    const [height, updateHeight] = useReducer(v => {

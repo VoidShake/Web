@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/client'
 import Image from 'next/image'
 import { darken } from 'polished'
 import { FC } from 'react'
@@ -139,10 +140,14 @@ const Steps = styled.ul`
    }
 `
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   const { params } = ctx
+
    await database()
+   const session = await getSession({ ctx })
 
    const [pack] = await Pack.aggregate<IPack>([
+      { $match: { slug: params?.pack, $or: [{ author: session?.user?.email }, { private: false }] } },
       {
          $project: {
             name: true,
@@ -152,7 +157,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             description: true,
          },
       },
-      { $match: { slug: params?.pack } },
    ])
 
    if (!pack) return { notFound: true }

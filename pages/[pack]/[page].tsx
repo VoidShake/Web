@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/client'
 import { FC, ReactNode, useMemo } from 'react'
 import Layout from '../../components/Layout'
 import ModCard from '../../components/ModCard'
@@ -81,11 +82,14 @@ const Split = styled.div<{ right?: boolean }>`
    }
 `
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   const { params } = ctx
+
    await database()
+   const session = await getSession({ ctx })
 
    const [result] = await Page.aggregate<IPage & { pack: IPack }>([
-      { $match: { slug: params?.page.toString() } },
+      { $match: { slug: params?.page } },
       {
          $lookup: {
             from: 'packs',
@@ -117,6 +121,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
    if (!result) return { notFound: true }
 
    const { pack, ...page } = result
+   if (pack.private && pack.author !== session?.user?.email) return { notFound: true }
 
    if (!pack) return { notFound: true }
    const release = await Release.findOne({ pack: pack._id })
@@ -127,8 +132,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       const [ra, rb] = [a, b].map(x => Object.values(Relevance).indexOf(x.relevance ?? Relevance.MINOR))
       return ra - rb
    })
-
-   console.log(unsorted)
 
    return {
       props: {

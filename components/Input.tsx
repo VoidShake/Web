@@ -8,17 +8,28 @@ const Style = styled.input`
    color: ${p => p.theme.text};
 `
 
-const Input: FC<{
-   value: string
-   onChange: Dispatch<string>
-   placeholder?: string
-   type?: string
+interface BaseProps<T> {
    required?: boolean
-   as?: ElementType,
    id?: string
    className?: string
+   value: T
+   onChange: Dispatch<T>
+}
+
+const Input: FC<BaseProps<string> & {
+   placeholder?: string
+   type?: string
+   as?: ElementType,
 }> = ({ onChange, type = 'text', ...props }) => <Style {...props} type={type} onChange={e => onChange(e.target.value)} />
 
 export const Textarea: typeof Input = props => <Input {...props} as='textarea' />
+
+const CheckboxStyle = styled.input`
+   margin: 0 0.5rem;
+`
+
+export const Checkbox: FC<BaseProps<boolean>> = ({ value, onChange, ...props }) => (
+   <CheckboxStyle type='checkbox' checked={value ?? false} onChange={e => onChange(e.target.checked)} {...props} />
+)
 
 export default Input

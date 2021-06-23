@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/client'
 import { invert } from 'polished'
 import { FC } from 'react'
 import Layout from '../components/Layout'
@@ -43,9 +44,10 @@ const List = styled.ul`
    }
 `
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ctx => {
    await database()
-   const rawPacks = await Pack.find()
+   const session = await getSession({ ctx })
+   const rawPacks = await Pack.find({ $or: [{ author: session?.user?.email }, { private: false }] })
    return { props: { packs: rawPacks.map(serialize) } }
 }
 

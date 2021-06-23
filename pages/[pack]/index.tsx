@@ -2,9 +2,10 @@ import styled from '@emotion/styled'
 import { Clock, Cog, Download } from '@styled-icons/fa-solid'
 import { StyledIcon } from '@styled-icons/styled-icon'
 import { GetServerSideProps } from 'next'
-import { useSession } from 'next-auth/client'
+import { getSession, useSession } from 'next-auth/client'
 import { createElement, FC, useMemo, useState } from 'react'
 import Background from '../../components/Background'
+import Banner from '../../components/Banner'
 import Layout from '../../components/Layout'
 import Line from '../../components/Line'
 import Link from '../../components/Link'
@@ -14,18 +15,13 @@ import Title from '../../components/Title'
 import database, { serialize } from '../../database'
 import { IMod } from '../../database/models/Mod'
 import Pack, { IPack } from '../../database/models/Pack'
+import { IPage } from '../../database/models/Page'
 import Release, { IRelease } from '../../database/models/Release'
 
-const Page: FC<{
+const Page: FC<IPack & {
    mods: IMod[]
-   name: string
-   slug: string
-   description?: string
-   assets: IPack['assets']
-   links: IPack['links']
    pages: LinkPage[]
    version?: string
-   author: string
 }> = ({ name, assets, links, description, version, slug, author, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
@@ -65,6 +61,9 @@ const Page: FC<{
 
    return (
       <Layout title={name} image={assets?.icon} description={description}>
+
+         {props.private && <Banner>This pack is private, only you are able to see it</Banner>}
+
          <Background src={assets?.background} />
 
          <Title noline>
@@ -128,11 +127,14 @@ const Description = styled.p`
    margin: 0 auto;
 `
 
-export const getServerSideProps: GetServerSideProps = async ({ params, query }) => {
-   await database()
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   const { params, query } = ctx
 
-   const [pack] = await Pack.aggregate<IPack>([
-      { $match: { slug: params?.pack } },
+   await database()
+   const session = await getSession({ ctx })
+
+   const [pack] = await Pack.aggregate<IPack & { pages: IPage[] }>([
+      { $match: { slug: params?.pack, $or: [{ author: session?.user?.email }, { private: false }] } },
       {
          $lookup: {
             from: 'pages',
@@ -185,12 +187,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params, query }) 
    const version = release?.version ?? null
    const mods = release?.mods ?? []
 
-   const pages =
-      pack.pages?.map(({ slug, title }) => ({
-         title,
-         slug,
-         link: `/${pack.slug}/${slug}`,
-      })) ?? []
+   const pages = pack.pages.map(({ slug, title }) => ({
+      title,
+      slug,
+      link: `/${pack.slug}/${slug}`,
+   })) ?? []
 
    return { props: { ...serialize(pack), mods: serialize(mods), pages, version } }
 }

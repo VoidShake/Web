@@ -1,9 +1,10 @@
 import { css, Theme } from '@emotion/react'
 import styled from '@emotion/styled'
+import { invert } from 'polished'
 
-const ButtonStyle = (p: { theme: Theme }) => css`
+export const ButtonStyle = (p: { theme: Theme }) => css`
    text-decoration: none;
-   color: black;
+   color: ${invert(p.theme.text)};
    background: ${p.theme.secondary};
    padding: 0.8rem;
 
@@ -12,6 +13,10 @@ const ButtonStyle = (p: { theme: Theme }) => css`
 
    &:hover {
       outline-width: 2px;
+   }
+   
+   svg {
+      margin-left: 1rem;
    }
 `
 

@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import { ArrowRight } from '@styled-icons/fa-solid'
 import { groupBy } from 'lodash'
 import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import { darken } from 'polished'
 import { FC, useCallback, useMemo } from 'react'
@@ -131,12 +132,15 @@ const Versions = styled.p`
    font-size: 2rem;
 `
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   const { params } = ctx
+
    await database()
+   const session = await getSession({ ctx })
 
    const versions = params?.range.toString().split('..') ?? []
 
-   const pack = await Pack.findOne({ slug: params?.pack as string })
+   const pack = await Pack.findOne({ slug: params?.pack as string, $or: [{ author: session?.user?.email }, { private: false }] })
    if (!pack) return { notFound: true }
 
    const releases = await Release.find({ pack: pack._id }, { version: true }, { sort: { date: -1 } })

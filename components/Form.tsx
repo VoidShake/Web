@@ -1,18 +1,17 @@
 import styled from "@emotion/styled";
 
 const Form = styled.form`
-   display: grid;
 
    margin-top: 2rem;
    margin: 0 auto;
 
-   gap: 1rem;
    font-size: 2rem;
    width: fit-content;
+   align-items: end;
 
    label {
-      font-size: 1rem;
       margin-bottom: -0.5rem;
+      font-size: 1rem;
       font-style: italic;
    }
 
@@ -20,6 +19,11 @@ const Form = styled.form`
       min-height: 200px;
       max-height: 700px;
       resize: none;
+   }
+
+   &, & > div {
+      display: grid;
+      gap: 1rem;
    }
 `
 

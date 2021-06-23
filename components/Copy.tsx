@@ -9,6 +9,8 @@ const Text = styled.button`
    padding: 0.5rem;
    transition: all 0.1s linear;
    border-radius: 0.2rem;
+   width: max-content;
+   margin: 0 auto;
 
    & + span {
       margin-left: 0.5rem;

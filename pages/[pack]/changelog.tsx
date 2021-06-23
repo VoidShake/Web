@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/client'
 import { FC } from 'react'
 import Background from '../../components/Background'
 import useTooltip from '../../components/hooks/useTooltip'
@@ -51,11 +52,14 @@ const Releases = styled.ul`
    width: min-content;
 `
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ctx => {
+   const { params } = ctx
+
    await database()
+   const session = await getSession({ ctx })
 
    const [pack] = await Pack.aggregate<IPack>([
-      { $match: { slug: params?.pack } },
+      { $match: { slug: params?.pack, $or: [{ author: session?.user?.email }, { private: false }] } },
       {
          $lookup: {
             from: 'releases',

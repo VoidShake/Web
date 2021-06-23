@@ -2,17 +2,20 @@ import { css, Global, useTheme } from '@emotion/react'
 import { Provider as AuthProvider } from 'next-auth/client'
 import { AppComponent } from 'next/dist/next-server/lib/router/router'
 import React, { FC } from 'react'
+import { PortalProvider } from '../components/hooks/usePortal'
 import { SettingsProvider } from '../components/hooks/useSettings'
 import '../style/reset.css'
 
 const App: AppComponent = ({ Component, pageProps }) => {
    return (
-      <SettingsProvider>
-         <AuthProvider session={pageProps.session}>
-            <Styles />
-            <Component {...pageProps} />
-         </AuthProvider>
-      </SettingsProvider>
+      <PortalProvider>
+         <SettingsProvider>
+            <AuthProvider session={pageProps.session}>
+               <Styles />
+               <Component {...pageProps} />
+            </AuthProvider>
+         </SettingsProvider>
+      </PortalProvider>
    )
 }
 

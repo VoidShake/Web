@@ -11,9 +11,10 @@ export default forMethod(
             id: Joi.string().required(),
          },
          body: {
-            name: Joi.string().optional(),
-            description: Joi.string().optional(),
+            name: Joi.string(),
+            description: Joi.string(),
             links: Joi.object().pattern(/^/, Joi.string()),
+            private: Joi.boolean(),
          },
       })
 
