@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/client'
 import { useRouter } from 'next/router'
 import { invert } from 'polished'
 import { createElement, FC, useEffect } from 'react'
+import { FormattedMessage } from 'react-intl'
 import { LinkButton as Link } from '../components/Button'
 import useSettings from '../components/hooks/useSettings'
 import useTooltip from '../components/hooks/useTooltip'
@@ -21,7 +22,9 @@ const Page: FC = () => {
 
    return (
       <Layout>
-         <Title>Profile</Title>
+         <Title>
+            <FormattedMessage defaultMessage='Profile' />
+         </Title>
 
          {session?.user ? <Profile {...session.user} /> : <p>You are not logged in</p>}
       </Layout>

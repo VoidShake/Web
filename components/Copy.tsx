@@ -2,6 +2,7 @@ import styled from '@emotion/styled'
 import { Copy as Icon } from '@styled-icons/fa-solid'
 import { invert } from 'polished'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
+import { useIntl } from 'react-intl'
 import useTooltip from './hooks/useTooltip'
 
 const Text = styled.button`
@@ -38,6 +39,7 @@ const Copy: FC<{
 }> = ({ content, children }) => {
    const [justCopied, setJustCopied] = useState(false)
    const copyText = useMemo(() => content ?? children, [content, children])
+   const { formatMessage } = useIntl()
 
    const click = useCallback(() => {
       navigator.clipboard.writeText(copyText)
@@ -52,7 +54,7 @@ const Copy: FC<{
    const tooltip = useTooltip(`copy-${copyText}`, { event: 'click', eventOff: 'mouseleave', afterShow: click })
 
    return (
-      <Text data-tip='Copied' data-for={`copy-${copyText}`} onClick={click}>
+      <Text data-tip={formatMessage({ defaultMessage: 'Copied' })} data-for={`copy-${copyText}`} onClick={click}>
          <span>{children}</span>
          <Icon size='1rem' />
          {tooltip}

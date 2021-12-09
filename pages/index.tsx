@@ -3,6 +3,7 @@ import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/client'
 import { invert } from 'polished'
 import { FC } from 'react'
+import { FormattedMessage } from 'react-intl'
 import Layout from '../components/Layout'
 import Link from '../components/Link'
 import Title from '../components/Title'
@@ -11,7 +12,9 @@ import Pack, { IPack } from '../database/models/Pack'
 
 const Page: FC<{ packs: Partial<IPack>[] }> = ({ packs }) => (
    <Layout>
-      <Title>Browse packs</Title>
+      <Title>
+         <FormattedMessage defaultMessage='Browse packs' />
+      </Title>
 
       <List>
          {packs.map(pack => (

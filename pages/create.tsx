@@ -35,12 +35,4 @@ const Form: FC = () => {
    )
 }
 
-/*
-export const getServerSideProps: GetServerSideProps = async () => {
-   await database()
-   const rawPacks = await Pack.find()
-   return { props: { packs: rawPacks.map(serialize) } }
-}
-*/
-
 export default Page

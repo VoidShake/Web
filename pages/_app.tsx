@@ -1,19 +1,31 @@
 import { css, Global, useTheme } from '@emotion/react'
+import { NextComponentType } from 'next'
 import { Provider as AuthProvider } from 'next-auth/client'
-import { AppComponent } from 'next/dist/next-server/lib/router/router'
+import NextApp, { AppContext } from 'next/app'
+import { AppProps } from 'next/dist/next-server/lib/router/router'
 import React, { FC } from 'react'
+import { IntlProvider } from 'react-intl'
 import { PortalProvider } from '../components/hooks/usePortal'
 import { SettingsProvider } from '../components/hooks/useSettings'
+import { getTranslations } from '../lib/localization'
 import '../style/reset.css'
 
-const App: AppComponent = ({ Component, pageProps }) => {
+type Props = AppProps & {
+   messages: Record<string, string>
+   locale: string
+}
+
+const App: NextComponentType<AppContext, Props, Props> = ({ Component, pageProps, locale, messages }) => {
+
    return (
       <PortalProvider>
          <SettingsProvider>
-            <AuthProvider session={pageProps.session}>
-               <Styles />
-               <Component {...pageProps} />
-            </AuthProvider>
+            <IntlProvider defaultLocale='en' locale={locale} messages={messages}>
+               <AuthProvider session={pageProps.session}>
+                  <Styles />
+                  <Component {...pageProps} />
+               </AuthProvider>
+            </IntlProvider>
          </SettingsProvider>
       </PortalProvider>
    )
@@ -63,5 +75,14 @@ const scrollbar = css`
       background: #27292c;
    }
 `
+
+App.getInitialProps = async ctx => {
+   const requestedLocale = 'de'
+
+   const [locale, messages] = await getTranslations(requestedLocale)
+   const props = await NextApp.getInitialProps(ctx)
+
+   return { ...props as any, locale, messages }
+}
 
 export default App

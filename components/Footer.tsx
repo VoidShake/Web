@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import { useSession } from 'next-auth/client'
 import React, { FC } from 'react'
+import { FormattedMessage } from 'react-intl'
 import Link from './Link'
 
 const Footer: FC = () => {
@@ -10,13 +11,14 @@ const Footer: FC = () => {
       <Style>
          {session?.user ? (
             <p>
-               Logged in as{' '}
                <Link underline='hover' href='/profile'>
-                  {session.user.name}
+                  <FormattedMessage defaultMessage='Logged in as {name}' values={session.user} />
                </Link>
             </p>
          ) : (
-            <Link href='/api/auth/signin'>Login</Link>
+            <Link href='/api/auth/signin'>
+               <FormattedMessage defaultMessage='Login' />
+            </Link>
          )}
       </Style>
    )

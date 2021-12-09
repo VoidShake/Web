@@ -11,6 +11,14 @@
       ]
    ],
    "plugins": [
-      "@emotion/babel-plugin"
+      "@emotion/babel-plugin",
+      [
+         "babel-plugin-react-intl",
+         {
+            "ast": true,
+            "idInterpolationPattern": "[sha512:contenthash:base64:6]",
+            "extractFromFormatMessageCall": true
+         }
+      ]
    ]
 }

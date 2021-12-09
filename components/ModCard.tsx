@@ -2,6 +2,7 @@ import { css } from '@emotion/react'
 import styled from '@emotion/styled'
 import { darken, invert, mix, saturate } from 'polished'
 import { FC, useMemo } from 'react'
+import { useIntl } from 'react-intl'
 import { IMod } from '../database/models/Mod'
 import InvisibleLink from './InvisibleLink'
 
@@ -19,7 +20,13 @@ const ModCard: FC<
       if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return 'major'
    }, [library, pages, highlight])
 
-   const info = `Referenced in ${pages?.length} ${pages?.length === 1 ? 'page' : 'pages'}`
+   const { formatMessage } = useIntl()
+
+   const info = formatMessage({
+      defaultMessage: `Referenced in {count, plural,
+      one {a page}
+      other {# pages}
+   }` }, { count: pages?.length ?? 0 })
    const tooltip = `${info} (${pages?.map(p => p.title).join(', ')})`
 
    return (
