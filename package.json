@@ -5,9 +5,10 @@
       "dev": "next --openssl-legacy-provider",
       "build": "yarn lang:extract && yarn lang:compile && next build",
       "start": "next start",
-      "type-check": "tsc",
+      "type-check": "tsc --noEmit",
       "format": "prettier --write **/*.{tsx,ts,scss}",
       "lint": "eslint --fix **/*.{tsx,ts}",
+      "test:ci": "yarn type-check && yarn lint",
       "lang:extract": "formatjs extract {pages,components}/**/*.{ts,tsx} --format simple --id-interpolation-pattern [sha512:contenthash:base64:6] --out-file lang/en.json",
       "lang:compile": "formatjs compile-folder --ast --format simple lang compiled-lang"
    },
