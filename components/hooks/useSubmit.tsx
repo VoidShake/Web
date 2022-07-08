@@ -20,8 +20,8 @@ export default function useSubmit<T>(endpoint: string, data: Record<string, unkn
                },
             })
             onSuccess?.(await response.json())
-         } catch (e) {
-            setError(e)
+         } catch (error) {
+            setError(error as Error)
          } finally {
             setLoading(false)
          }

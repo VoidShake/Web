@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { invert } from 'polished'
 import { FC } from 'react'
 import { FormattedMessage } from 'react-intl'

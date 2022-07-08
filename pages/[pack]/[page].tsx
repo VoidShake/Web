@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { FC, ReactNode, useMemo } from 'react'
 import Layout from '../../components/Layout'
 import ModCard from '../../components/ModCard'

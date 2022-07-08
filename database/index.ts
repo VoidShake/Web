@@ -23,12 +23,7 @@ async function database() {
 
    if (!cached.promise) {
       const opts: ConnectOptions = {
-         useNewUrlParser: true,
-         useUnifiedTopology: true,
          bufferCommands: false,
-         bufferMaxEntries: 0,
-         useFindAndModify: false,
-         useCreateIndex: true,
          dbName: MONGODB_DB,
       }
 

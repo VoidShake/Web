@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken'
 import { NextApiHandler, NextApiRequest } from 'next'
 import { Session } from 'next-auth'
-import { ApiError } from 'next/dist/next-server/server/api-utils'
-import Pack from '../database/models/Pack'
+import { ApiError } from 'next/dist/server/api-utils'
+import Pack, { IPack } from '../database/models/Pack'
 import withSession, { AuthenticatedApiHandler } from './wrapper'
 
 const KEY = process.env.JWT_SECRET
@@ -12,10 +12,11 @@ export interface Token {
    created: number
 }
 
-export async function getAuthorizedPack(session: Session | undefined | null, packId: string) {
+export async function getAuthorizedPack(session: Session | undefined | null, packId: string, keys?: (keyof IPack)[]) {
    if (!session) return false
-   
-   const pack = await Pack.findById(packId)
+
+   const projection = keys?.reduce((o, k) => ({ ...o, [k]: true }), {})
+   const pack = await Pack.findById(packId, projection)
    if (!pack) throw new ApiError(404, 'Pack not found')
 
    if (pack.id === session.packToken?.pack) return pack
@@ -23,20 +24,11 @@ export async function getAuthorizedPack(session: Session | undefined | null, pac
    return false
 }
 
-export async function authorizedPack(session: Session | undefined | null, packId: string) {
-   const pack = await getAuthorizedPack(session, packId)
+export async function authorizedPack(session: Session | undefined | null, packId: string, keys?: (keyof IPack)[]) {
+   const pack = await getAuthorizedPack(session, packId, keys)
    if (!pack) throw new ApiError(403, 'Unauthorized')
    return pack
 }
-
-/*
-export async function getPack(session?: Session) {
-   if (!session?.packToken) throw new ApiError(403, 'Only accessible using a pack token')
-   const pack = await Pack.findById(session.packToken.pack)
-   if (!pack) throw new ApiError(404, 'Pack not found')
-   return pack
-}
-*/
 
 export function createToken(pack: string) {
    if (!KEY) throw new ApiError(500, 'No JWT Secret defined')
@@ -61,7 +53,7 @@ export function tokenSession(req: NextApiRequest): Session | null {
    return null
 }
 
-export function forwardTokenRequest(handler: AuthenticatedApiHandler, key = 'id'): NextApiHandler {
+export function forwardTokenRequest(handler: AuthenticatedApiHandler | NextApiHandler, key = 'id'): NextApiHandler {
    return withSession((req, res, session) => {
       if (!session.packToken) throw new ApiError(403, 'Pack token required')
       req.query[key] = session.packToken.pack

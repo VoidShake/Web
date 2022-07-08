@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 import { Clock, Cog, Download } from '@styled-icons/fa-solid'
 import { StyledIcon } from '@styled-icons/styled-icon'
 import { GetServerSideProps } from 'next'
-import { getSession, useSession } from 'next-auth/client'
+import { getSession, useSession } from 'next-auth/react'
 import { createElement, FC, useMemo, useState } from 'react'
 import Background from '../../components/Background'
 import Banner from '../../components/Banner'
@@ -18,11 +18,13 @@ import Pack, { IPack } from '../../database/models/Pack'
 import { IPage } from '../../database/models/Page'
 import Release, { IRelease } from '../../database/models/Release'
 
-const Page: FC<IPack & {
-   mods: IMod[]
-   pages: LinkPage[]
-   version?: string
-}> = ({ name, assets, links, description, version, slug, author, ...props }) => {
+const Page: FC<
+   IPack & {
+      mods: IMod[]
+      pages: LinkPage[]
+      version?: string
+   }
+> = ({ name, assets, links, description, version, slug, author, ...props }) => {
    const [hoveredMod, setHoveredMod] = useState<IMod>()
    const [hoveredPage, setHoveredPage] = useState<string>()
 
@@ -44,24 +46,21 @@ const Page: FC<IPack & {
       [props.mods, hoveredPage]
    )
 
-   const [session] = useSession()
+   const { data: session } = useSession()
    const isAuthor = session?.user?.email === author
 
    const [download] = Object.entries(links ?? {})
 
    const subtitles = useMemo(() => {
-      const subtitles: Array<[string, string, StyledIcon]> = []
-
-      if (download) subtitles.push([`/${slug}/install/${download[0]}`, 'Download', Download])
-      subtitles.push([`/${slug}/changelog`, 'Changelog', Clock])
-      if (isAuthor) subtitles.push([`/${slug}/settings`, 'Settings', Cog])
-
-      return subtitles
+      const values: Array<[string, string, StyledIcon]> = []
+      if (download) values.push([`/${slug}/install/${download[0]}`, 'Download', Download])
+      values.push([`/${slug}/changelog`, 'Changelog', Clock])
+      if (isAuthor) values.push([`/${slug}/settings`, 'Settings', Cog])
+      return values
    }, [download, isAuthor])
 
    return (
       <Layout title={name} image={assets?.icon} description={description}>
-
          {props.private && <Banner>This pack is private, only you are able to see it</Banner>}
 
          <Background src={assets?.background} />
@@ -187,11 +186,12 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
    const version = release?.version ?? null
    const mods = release?.mods ?? []
 
-   const pages = pack.pages.map(({ slug, title }) => ({
-      title,
-      slug,
-      link: `/${pack.slug}/${slug}`,
-   })) ?? []
+   const pages =
+      pack.pages.map(({ slug, title }) => ({
+         title,
+         slug,
+         link: `/${pack.slug}/${slug}`,
+      })) ?? []
 
    return { props: { ...serialize(pack), mods: serialize(mods), pages, version } }
 }

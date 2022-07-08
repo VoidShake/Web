@@ -2,11 +2,11 @@ import styled from '@emotion/styled'
 import { ArrowRight } from '@styled-icons/fa-solid'
 import { groupBy } from 'lodash'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { darken } from 'polished'
 import { FC, useCallback, useMemo } from 'react'
-import { FormattedMessage, useIntl } from 'react-intl'
+import { FormattedMessage } from 'react-intl'
 import Layout from '../../../components/Layout'
 import Line from '../../../components/Line'
 import MinifiedList from '../../../components/MinifiedList'
@@ -26,7 +26,6 @@ const Page: FC<{
    changes: Array<{ changelog: string; version: string }>
 }> = ({ from, to, pack, versions, changes }) => {
    const router = useRouter()
-   const { formatMessage } = useIntl()
 
    const mods = useMemo(() => {
       const added = to.mods
@@ -74,8 +73,7 @@ const Page: FC<{
          <Stats>
             {lists.map(([change, list]) => (
                <Stat change={change} key={change}>
-                  <FormattedMessage defaultMessage='{count, plural, one {mod} other {# mods} }' values={{ count: list.length }} />
-                  {' '}{Change[change]}
+                  <FormattedMessage defaultMessage='{count, plural, one {mod} other {# mods} }' values={{ count: list.length }} /> {Change[change]}
                </Stat>
             ))}
          </Stats>

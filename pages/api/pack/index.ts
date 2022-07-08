@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { ApiError } from 'next/dist/next-server/server/api-utils'
+import { ApiError } from 'next/dist/server/api-utils'
 import Pack from '../../../database/models/Pack'
 import { forwardTokenRequest } from '../../../lib/token'
 import validate from '../../../lib/validate'

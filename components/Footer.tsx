@@ -1,11 +1,11 @@
 import styled from '@emotion/styled'
-import { useSession } from 'next-auth/client'
-import React, { FC } from 'react'
+import { useSession } from 'next-auth/react'
+import { FC } from 'react'
 import { FormattedMessage } from 'react-intl'
 import Link from './Link'
 
 const Footer: FC = () => {
-   const [session] = useSession()
+   const { data: session } = useSession()
 
    return (
       <Style>

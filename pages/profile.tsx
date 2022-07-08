@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { Moon, Sun } from '@styled-icons/fa-solid'
 import { Session } from 'next-auth'
-import { useSession } from 'next-auth/client'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { invert } from 'polished'
 import { createElement, FC, useEffect } from 'react'
@@ -13,12 +13,12 @@ import Layout from '../components/Layout'
 import Title from '../components/Title'
 
 const Page: FC = () => {
-   const [session, loading] = useSession()
+   const { data: session, status } = useSession()
    const router = useRouter()
 
    useEffect(() => {
-      if (!session?.user && !loading) router.push('/api/auth/signin')
-   }, [session, router, loading])
+      if (status === 'unauthenticated') router.push('/api/auth/signin')
+   }, [router, status])
 
    return (
       <Layout>

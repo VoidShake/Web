@@ -1,4 +1,4 @@
-import { useSession } from 'next-auth/client'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { FC, useState } from 'react'
 import Button from '../components/Button'
@@ -10,7 +10,7 @@ import Title from '../components/Title'
 import { IPack } from '../database/models/Pack'
 
 const Page: FC = () => {
-   const [session] = useSession()
+   const { data: session } = useSession()
 
    return (
       <Layout>

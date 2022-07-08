@@ -1,6 +1,6 @@
 import styled from '@emotion/styled'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { FC } from 'react'
 import Background from '../../components/Background'
 import useTooltip from '../../components/hooks/useTooltip'

@@ -1,6 +1,6 @@
 import Joi, { ValidationOptions } from 'joi'
 import { NextApiRequest } from 'next'
-import { ApiError } from 'next/dist/next-server/server/api-utils'
+import { ApiError } from 'next/dist/server/api-utils'
 
 type Schema = Record<string, Joi.Schema>
 

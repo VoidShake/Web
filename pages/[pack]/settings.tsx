@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { Eye, Lock } from '@styled-icons/fa-solid'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/client'
+import { getSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import { invert } from 'polished'
 import { createElement, FC, useReducer, useState } from 'react'
@@ -37,11 +37,9 @@ const Page: FC<
          <Title subtitle={{ link: `/${slug}`, ...current }}>Settings</Title>
 
          <Style>
-
             <Copy content={token}>Copy Token</Copy>
 
             <Form onSubmit={save}>
-
                <Toggle active={priv} onClick={togglePrivate}>
                   {priv ? 'Private' : 'Public'}
                   {createElement(priv ? Lock : Eye, { size: '1.5rem' })}
@@ -58,9 +56,7 @@ const Page: FC<
                </Cell>
 
                <Button>Save</Button>
-
             </Form>
-
          </Style>
       </Layout>
    )
@@ -70,8 +66,8 @@ const Toggle = styled.button<{ active: boolean }>`
    ${ButtonStyle};
 
    padding: 1rem 0;
-   background: ${p => p.active ? invert(p.theme.text) : p.theme.secondary};   
-   color: ${p => p.active ? p.theme.secondary : invert(p.theme.text)};   
+   background: ${p => (p.active ? invert(p.theme.text) : p.theme.secondary)};
+   color: ${p => (p.active ? p.theme.secondary : invert(p.theme.text))};
 `
 
 const Style = styled.section`
@@ -86,9 +82,9 @@ const Form = styled(BaseForm)`
    max-width: 800px;
 
    grid-template:
-      "name private"
-      "desc desc"
-      "save save"
+      'name private'
+      'desc desc'
+      'save save'
       / 2fr 1fr;
 
    ${Button} {

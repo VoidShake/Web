@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'
+import { ObjectId } from 'bson'
 import Mongoose, { Schema } from 'mongoose'
 import { define } from '..'
 import Model from './Base'
