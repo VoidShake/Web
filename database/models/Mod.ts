@@ -39,6 +39,9 @@ const schema = new Schema({
       required: true,
    },
    websiteUrl: String,
+   wikiUrl: String,
+   issuesUrl: String,
+   sourceUrl: String,
    summary: String,
    slug: {
       type: String,
