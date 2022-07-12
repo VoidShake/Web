@@ -1,18 +1,18 @@
 import { IMod } from '../database/models/Mod'
 
-const BASE_URL = 'https://addons-ecs.forgesvc.net/api/v2'
+const BASE_URL = 'https://api.curseforge.com/v1'
+const { CURSEFORGE_TOKEN } = process.env
 
 interface RawMod {
-   attachments: Array<{
-      isDefault: boolean
+   logo?: {
       thumbnailUrl: string
       url: string
-   }>
+   }
    primaryCategoryId: number
    categories: IMod['categories']
    name: string
    slug: string
-   popularityScore: number
+   gamePopularityRank: number
 }
 
 interface RawPack {
@@ -32,11 +32,18 @@ interface RawPack {
    }[]
 }
 
-export function getMod(id: number): Promise<RawMod> {
-   return fetch(`${BASE_URL}/addon/${id}`).then(r => r.json())
+export async function getMod(id: number) {
+   const response = await fetch(`${BASE_URL}/mods/${id}`, {
+      headers: {
+         'x-api-key': CURSEFORGE_TOKEN!,
+      },
+   })
+
+   const { data } = (await response.json()) as { data: RawMod }
+   return data
 }
 
-export async function getMods(pack: RawPack): Promise<IMod[]> {
+export async function getMods(pack: RawPack) {
    const addons = pack.installedAddons
       .filter(a => a.installedFile.modules.some(m => m.foldername === 'META-INF'))
       .map(({ addonID, installedFile }) => ({
@@ -49,8 +56,8 @@ export async function getMods(pack: RawPack): Promise<IMod[]> {
       }))
 
    return Promise.all(
-      addons.map(async a => {
-         const { attachments, primaryCategoryId, categories, ...mod } = await getMod(a.cfID)
+      addons.map<Promise<IMod>>(async a => {
+         const { logo, primaryCategoryId, categories, gamePopularityRank, ...mod } = await getMod(a.cfID)
 
          const libIds = [421, 425, 423, 435]
 
@@ -58,8 +65,9 @@ export async function getMods(pack: RawPack): Promise<IMod[]> {
             ...a,
             ...mod,
             categories,
-            library: !!(a.library && [421, 425].includes(primaryCategoryId) && categories.every(c => libIds.includes(c.categoryId))),
-            icon: attachments.find(a => a.isDefault)?.thumbnailUrl,
+            library: !!(a.library && [421, 425].includes(primaryCategoryId) && categories.every(c => libIds.includes(c.id))),
+            popularityScore: gamePopularityRank,
+            icon: logo?.thumbnailUrl,
          }
       })
    )

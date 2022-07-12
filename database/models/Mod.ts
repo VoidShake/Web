@@ -13,10 +13,10 @@ export interface IMod {
    highlight?: boolean
    fade?: boolean
    categories: Array<{
-      categoryId: number
+      id: number
       name: string
       url: string
-      avatarUrl: string
+      iconUrl: string
    }>
    version: {
       date: string
@@ -48,10 +48,10 @@ const schema = new Schema({
    popularityScore: Number,
    categories: [
       new Schema({
-         categoryId: { type: Number, required: true },
+         id: { type: Number, required: false },
          name: { type: String, required: true },
          url: { type: String, required: true },
-         avatarUrl: { type: String, required: true },
+         iconUrl: { type: String, required: false },
       }),
    ],
    version: new Schema({
