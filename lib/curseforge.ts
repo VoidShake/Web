@@ -20,7 +20,9 @@ interface RawPack {
       addonID: number
       installedFile: {
          fileDate: string
-         displayName: string
+         /** @deprecated use `fileName` */
+         displayName?: string
+         fileName: string
          categorySectionPackageType: number
          dependencies: Array<{
             addonId: number
@@ -50,7 +52,7 @@ export async function getMods(pack: RawPack) {
          cfID: addonID,
          version: {
             date: installedFile.fileDate,
-            file: installedFile.displayName,
+            file: installedFile.fileName ?? installedFile.displayName,
          },
          library: pack.installedAddons.some(a => a.installedFile.dependencies.some(d => d.addonId === addonID)),
       }))
