@@ -18,15 +18,19 @@ const ModCard: FC<
       if (highlight) return 'highlighted'
       if (library) return 'library'
       if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return 'major'
-   }, [library, pages, highlight])
+   }, [library, pages, highlight, slug])
 
    const { formatMessage } = useIntl()
 
-   const info = formatMessage({
-      defaultMessage: `Referenced in {count, plural,
+   const info = formatMessage(
+      {
+         defaultMessage: `Referenced in {count, plural,
       one {a page}
       other {# pages}
-   }` }, { count: pages?.length ?? 0 })
+   }`,
+      },
+      { count: pages?.length ?? 0 }
+   )
    const tooltip = `${info} (${pages?.map(p => p.title).join(', ')})`
 
    return (

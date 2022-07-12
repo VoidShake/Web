@@ -13,6 +13,12 @@ interface RawMod {
    name: string
    slug: string
    gamePopularityRank: number
+   links: {
+      websiteUrl?: string
+      wikiUrl?: string
+      issuesUrl?: string
+      sourceUrl?: string
+   }
 }
 
 interface RawPack {
@@ -59,13 +65,14 @@ export async function getMods(pack: RawPack) {
 
    return Promise.all(
       addons.map<Promise<IMod>>(async a => {
-         const { logo, primaryCategoryId, categories, gamePopularityRank, ...mod } = await getMod(a.cfID)
+         const { logo, primaryCategoryId, categories, gamePopularityRank, links, ...mod } = await getMod(a.cfID)
 
          const libIds = [421, 425, 423, 435]
 
          return {
             ...a,
             ...mod,
+            ...links,
             categories,
             library: !!(a.library && [421, 425].includes(primaryCategoryId) && categories.every(c => libIds.includes(c.id))),
             popularityScore: gamePopularityRank,
