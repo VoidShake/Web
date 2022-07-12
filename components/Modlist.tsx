@@ -19,7 +19,7 @@ const Modlist: FC<{
    const libs = useMemo(() => mods.filter(m => m.library).length, [mods])
    const categories = useMemo(() => uniqBy(flatten(mods.map(m => m.categories)), c => c.id).filter(c => !HIDDEN_CATEGORIES.includes(c.id)), [mods])
 
-   const rank = useCallback((mod: IMod) => {
+   const rankOf = useCallback((mod: IMod) => {
       let rank = mod.popularityScore ?? 0
       if (mod.library) rank -= 100000000000
       if (mod.pages?.some(p => p.mods.find(m => m.slug === mod.slug && m.relevance === 'major'))) rank += 1000000000
@@ -31,8 +31,8 @@ const Modlist: FC<{
          mods
             .filter(m => !selectedCategory || m.categories.some(c => c.id === selectedCategory))
             .map(m => ({ ...m, highlight: m.highlight || m.categories.some(c => c.id === hoveredCategory) }))
-            .sort((a, b) => rank(b) - rank(a)),
-      [mods, hoveredCategory, selectedCategory]
+            .sort((a, b) => rankOf(b) - rankOf(a)),
+      [mods, hoveredCategory, selectedCategory, rankOf]
    )
 
    const somethingHighlighted = useMemo(() => sorted.some(m => m.highlight), [sorted])
@@ -46,13 +46,13 @@ const Modlist: FC<{
          </p>
 
          <Categories>
-            {categories.map(({ id: categoryId, name }) => (
+            {categories.map(({ id, name }) => (
                <Category
-                  selected={categoryId === selectedCategory}
-                  onMouseOver={() => hoverCategory(categoryId)}
+                  selected={id === selectedCategory}
+                  onMouseOver={() => hoverCategory(id)}
                   onMouseLeave={() => hoverCategory(undefined)}
-                  onClick={() => (selectedCategory === categoryId ? selectCategory(undefined) : selectCategory(categoryId))}
-                  key={categoryId}>
+                  onClick={() => (selectedCategory === id ? selectCategory(undefined) : selectCategory(id))}
+                  key={id}>
                   {name}
                </Category>
             ))}

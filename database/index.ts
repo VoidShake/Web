@@ -42,12 +42,12 @@ export const serialize: {
    <M>(model: Array<M>): M[]
 } = <M>(model?: Document | Document[]) => {
    if (model === null || model === undefined) return null
-   if (Array.isArray(model)) return (model.map(m => serialize(m)) as unknown) as M[]
+   if (Array.isArray(model)) return model.map(m => serialize(m)) as unknown as M[]
 
    if (typeof model === 'object' && '_id' in model) {
       const props = Object.entries(model instanceof Document ? model.toObject({ virtuals: true }) : model).reduce((o, [key, value]) => ({ ...o, [key]: serialize(value) }), {})
       const id = model._id?.toString()
-      return ({ ...props, id, _id: id } as unknown) as M
+      return { ...props, _id: id } as unknown as M
    }
 
    return model

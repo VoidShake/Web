@@ -18,7 +18,7 @@ const Page: FC<{ packs: Partial<IPack>[] }> = ({ packs }) => (
 
       <List>
          {packs.map(pack => (
-            <Link key={pack.id} href={`/${pack.slug}`}>
+            <Link key={pack._id} href={`/${pack.slug}`}>
                <li>
                   <img alt={pack.name} src={pack.assets?.icon} />
                   <h2>{pack.name}</h2>

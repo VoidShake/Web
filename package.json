@@ -2,7 +2,7 @@
    "name": "with-typescript",
    "version": "1.0.0",
    "scripts": {
-      "dev": "next --openssl-legacy-provider",
+      "dev": "next",
       "build": "yarn lang:extract && yarn lang:compile && next build",
       "start": "next start",
       "type-check": "tsc --noEmit",

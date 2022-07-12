@@ -21,14 +21,14 @@ const Page: FC<
    IPack & {
       token: string
    }
-> = ({ slug, assets, token, id, ...current }) => {
+> = ({ slug, assets, token, _id, ...current }) => {
    const router = useRouter()
 
    const [name, setName] = useState(current.name)
    const [description, setDescription] = useState(current.description)
    const [priv, togglePrivate] = useReducer(b => !b, current.private ?? false)
 
-   const [save] = useSubmit<IPack>(`pack/${id}`, { name, description, private: priv }, 'PUT', p => {
+   const [save] = useSubmit<IPack>(`pack/${_id}`, { name, description, private: priv }, 'PUT', p => {
       if (p.slug !== slug) router.push(`/${p.slug}/settings`)
    })
 
