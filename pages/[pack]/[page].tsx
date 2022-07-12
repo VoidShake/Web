@@ -8,7 +8,7 @@ import { Grid } from '../../components/Modlist'
 import Title from '../../components/Title'
 import database, { serialize } from '../../database'
 import { IMod } from '../../database/models/Mod'
-import { IPack } from '../../database/models/Pack'
+import Pack from '../../database/models/Pack'
 import Page, { IPage, Relevance } from '../../database/models/Page'
 import Release from '../../database/models/Release'
 
@@ -83,44 +83,15 @@ const Split = styled.div<{ right?: boolean }>`
 `
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
-   const { params } = ctx
-
    await database()
    const session = await getSession({ ctx })
 
-   const [result] = await Page.aggregate<IPage & { pack: IPack }>([
-      { $match: { slug: params?.page } },
-      {
-         $lookup: {
-            from: 'packs',
-            localField: 'pack',
-            foreignField: '_id',
-            as: 'pack',
-         },
-      },
-      {
-         $addFields: {
-            pack: {
-               $arrayElemAt: [
-                  {
-                     $filter: {
-                        input: '$pack',
-                        as: 'pack',
-                        cond: {
-                           $eq: ['$$pack.slug', params?.pack],
-                        },
-                     },
-                  },
-                  0,
-               ],
-            },
-         },
-      },
-   ])
+   const pack = await Pack.findOne({ slug: ctx.params?.pack })
+   if (!pack) return { notFound: true }
 
-   if (!result) return { notFound: true }
+   const page = await Page.findOne({ pack: pack._id, slug: ctx.params?.page })
+   if (!page) return { notFound: true }
 
-   const { pack, ...page } = result
    if (pack.private && pack.author !== session?.user?.email) return { notFound: true }
 
    if (!pack) return { notFound: true }
