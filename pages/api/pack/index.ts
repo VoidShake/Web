@@ -6,7 +6,7 @@ import validate from '../../../lib/validate'
 import withSession, { methodSwitch } from '../../../lib/wrapper'
 import updateHandler from './[id]'
 
-const put = forwardTokenRequest(updateHandler)
+const withToken = forwardTokenRequest(updateHandler)
 
 const post = withSession(async (req, res, session) => {
    validate(req, {
@@ -22,4 +22,4 @@ const post = withSession(async (req, res, session) => {
    res.json(pack)
 })
 
-export default methodSwitch({ post, put })
+export default methodSwitch({ post, put: withToken, get: withToken })
