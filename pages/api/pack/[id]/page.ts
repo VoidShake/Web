@@ -43,6 +43,8 @@ export default forMethod(
 
       await Page.updateOne({ slug, pack: id }, { ...req.body, slug, mods }, { upsert: true })
 
+      console.log(`Updated page '${req.body.title}' for pack with ID '${id}'`)
+
       res.status(204).end()
    })
 )

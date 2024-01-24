@@ -19,6 +19,8 @@ const post = withSession(async (req, res, session) => {
 
    const pack = await Pack.create({ ...req.body, author: session.user.email })
 
+   console.log(`created pack ${pack.nane}`)
+
    res.json(pack)
 })
 
