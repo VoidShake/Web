@@ -28,7 +28,8 @@ export default forMethod(
          return { ...o, [name]: `/api/pack/${id}/assets/${path}` }
       }, {})
 
-      console.log(`updated ${files.length} assets for pack with ID '${id}'`)
+      const keys = Object.keys(assets)
+      console.log(`updated ${keys.length} assets for pack with ID '${id}' (${keys.join(', ')})`)
 
       await Pack.findByIdAndUpdate(id, { assets }, { upsert: true })
       res.status(200).json({ assets })
