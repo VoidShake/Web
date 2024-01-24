@@ -26,6 +26,8 @@ export default withSession(async (req, res, session) => {
    const id = req.query.id as string
    await authorizedPack(session, id)
 
+   console.log(`creating release for pack with ID '${id}'`)
+
    const { installedAddons, ...release } = req.body
    const mods = await getMods({ installedAddons })
 
@@ -35,7 +37,7 @@ export default withSession(async (req, res, session) => {
       pack: id,
    })
 
-   console.log('Received data for', version)
+   console.log('successfully created release with version', version)
 
    return res.status(204).end()
 })
