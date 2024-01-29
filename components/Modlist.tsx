@@ -1,23 +1,24 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
-import { flatten, uniqBy } from 'lodash'
+import { flatten, uniq } from 'lodash'
 import { invert } from 'polished'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { IMod } from '../database/models/Mod'
+import ModCard, { ModProps } from './ModCard'
 import useTooltip from './hooks/useTooltip'
-import ModCard from './ModCard'
 
-const HIDDEN_CATEGORIES = [4780]
+// TODO
+const HIDDEN_CATEGORIES = ['4780']
 
 const Modlist: FC<{
-   mods: IMod[]
+   mods: ModProps[]
    onHover?: (mod?: IMod) => void
 }> = ({ mods, ...events }) => {
-   const [hoveredCategory, hoverCategory] = useState<number>()
-   const [selectedCategory, selectCategory] = useState<number>()
+   const [hoveredCategory, hoverCategory] = useState<string>()
+   const [selectedCategory, selectCategory] = useState<string>()
 
    const libs = useMemo(() => mods.filter(m => m.library).length, [mods])
-   const categories = useMemo(() => uniqBy(flatten(mods.map(m => m.categories)), c => c.id).filter(c => !HIDDEN_CATEGORIES.includes(c.id)), [mods])
+   const categories = useMemo(() => uniq(flatten(mods.map(m => m.categories))).filter(c => !HIDDEN_CATEGORIES.includes(c)), [mods])
 
    const rankOf = useCallback((mod: IMod) => {
       let rank = mod.popularityScore ?? 0
@@ -26,13 +27,16 @@ const Modlist: FC<{
       return rank
    }, [])
 
-   const sorted = useMemo(
+   const [librariesShown, showLibraries] = useState(false)
+   const filtered = useMemo<ModProps[]>(() => (librariesShown ? mods : mods.filter(it => !it.library)), [mods, librariesShown])
+
+   const sorted = useMemo<ModProps[]>(
       () =>
-         mods
-            .filter(m => !selectedCategory || m.categories.some(c => c.id === selectedCategory))
-            .map(m => ({ ...m, highlight: m.highlight || m.categories.some(c => c.id === hoveredCategory) }))
+         filtered
+            .filter(m => !selectedCategory || m.categories.some(c => c === selectedCategory))
+            .map(m => ({ ...m, highlight: m.highlight || m.categories.some(c => c === hoveredCategory) }))
             .sort((a, b) => rankOf(b) - rankOf(a)),
-      [mods, hoveredCategory, selectedCategory, rankOf]
+      [filtered, hoveredCategory, selectedCategory, rankOf]
    )
 
    const somethingHighlighted = useMemo(() => sorted.some(m => m.highlight), [sorted])
@@ -42,17 +46,17 @@ const Modlist: FC<{
       <Container>
          {tooltip}
          <p>
-            {mods.length - libs} mods ({libs} libraries)
+            {mods.length - libs} mods ({libs} libraries <input type='checkbox' checked={librariesShown} onChange={e => showLibraries(e.target.checked)} />)
          </p>
 
          <Categories>
-            {categories.map(({ id, name }) => (
+            {categories.map(name => (
                <Category
-                  selected={id === selectedCategory}
-                  onMouseOver={() => hoverCategory(id)}
+                  selected={name === selectedCategory}
+                  onMouseOver={() => hoverCategory(name)}
                   onMouseLeave={() => hoverCategory(undefined)}
-                  onClick={() => (selectedCategory === id ? selectCategory(undefined) : selectCategory(id))}
-                  key={id}>
+                  onClick={() => (selectedCategory === name ? selectCategory(undefined) : selectCategory(name))}
+                  key={name}>
                   {name}
                </Category>
             ))}
@@ -60,7 +64,7 @@ const Modlist: FC<{
 
          <Grid>
             {sorted.map(mod => (
-               <ModCard {...mod} key={mod.cfID} onHover={() => events.onHover?.(mod)} onBlur={() => events.onHover?.()} fade={somethingHighlighted && !mod.highlight} />
+               <ModCard {...mod} key={mod.id} onHover={() => events.onHover?.(mod)} onBlur={() => events.onHover?.()} fade={somethingHighlighted && !mod.highlight} />
             ))}
          </Grid>
       </Container>

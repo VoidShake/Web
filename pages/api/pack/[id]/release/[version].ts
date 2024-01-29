@@ -1,9 +1,22 @@
 import Joi from 'joi'
 import Release from '../../../../../database/models/Release'
-import { getMods } from '../../../../../lib/curseforge'
 import { authorizedPack } from '../../../../../lib/token'
 import validate from '../../../../../lib/validate'
 import withSession from '../../../../../lib/wrapper'
+
+const modSchema = Joi.object({
+   id: Joi.string(),
+   name: Joi.string(),
+   library: Joi.boolean().optional(),
+   websiteUrl: Joi.string().optional(),
+   summary: Joi.string().optional(),
+   slug: Joi.string(),
+   icon: Joi.string().optional(),
+   popularityScore: Joi.number().optional(),
+   categories: Joi.array().items(Joi.string()).unique().optional(),
+
+   version: Joi.string().optional(),
+})
 
 export default withSession(async (req, res, session) => {
    const { version } = req.query
@@ -14,11 +27,11 @@ export default withSession(async (req, res, session) => {
          version: Joi.string().required(),
       },
       body: {
-         installedAddons: Joi.array().required(),
+         mods: Joi.array().items(modSchema).required(),
          name: Joi.string().optional(),
          version: Joi.string().required(),
          date: Joi.string().required(),
-         url: Joi.string().required(),
+         url: Joi.string(),
          changelog: Joi.string().required(),
       },
    })
@@ -28,8 +41,7 @@ export default withSession(async (req, res, session) => {
 
    console.log(`creating release for pack with ID '${id}'`)
 
-   const { installedAddons, ...release } = req.body
-   const mods = await getMods({ installedAddons })
+   const { mods, ...release } = req.body
 
    await Release.create({
       ...release,

@@ -21,7 +21,7 @@ const put = withSession(async (req, res, session) => {
 
    Object.assign(pack, req.body)
    const updated = await pack.save()
-   
+
    console.log(`Updated pack '${updated.name}'`)
 
    return res.json(updated)

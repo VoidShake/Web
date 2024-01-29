@@ -10,7 +10,7 @@ import { FormattedMessage } from 'react-intl'
 import Layout from '../../../components/Layout'
 import Line from '../../../components/Line'
 import MinifiedList from '../../../components/MinifiedList'
-import ModLine, { Change, ChangeStyle, getChange, VersionedMod } from '../../../components/ModLine'
+import ModLine, { Change, ChangeStyle, VersionedMod, getChange } from '../../../components/ModLine'
 import Select from '../../../components/Select'
 import { Center } from '../../../components/Text'
 import Title from '../../../components/Title'
@@ -28,14 +28,12 @@ const Page: FC<{
    const router = useRouter()
 
    const mods = useMemo(() => {
-      const added = to.mods
-         .filter(m1 => !from.mods.some(m2 => m2.cfID === m1.cfID))
-         .map<VersionedMod>(m => ({ ...m, to: m.version }))
+      const added = to.mods.filter(m1 => !from.mods.some(m2 => m2.id === m1.id)).map<VersionedMod>(m => ({ ...m, to: m.version }))
 
       const changed = from.mods.map<VersionedMod>(mod => ({
          ...mod,
          from: mod.version,
-         to: to.mods.find(m => m.cfID === mod.cfID)?.version,
+         to: to.mods.find(m => m.id === mod.id)?.version,
       }))
 
       return [...changed, ...added]
@@ -81,7 +79,7 @@ const Page: FC<{
          {lists.map(([change, list]) => (
             <MinifiedList object={`${Change[change]} mod`} minified={change === Change.unchanged} toggleable={change === Change.unchanged} key={change}>
                {list.map(mod => (
-                  <ModLine key={mod.cfID} {...mod} />
+                  <ModLine key={mod.id} {...mod} />
                ))}
             </MinifiedList>
          ))}

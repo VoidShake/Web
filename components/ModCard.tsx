@@ -1,5 +1,6 @@
 import { css } from '@emotion/react'
 import styled from '@emotion/styled'
+import Image from 'next/image'
 import { darken, invert, mix, saturate } from 'polished'
 import { FC, useMemo } from 'react'
 import { useIntl } from 'react-intl'
@@ -8,12 +9,16 @@ import InvisibleLink from './InvisibleLink'
 
 type Scheme = 'highlighted' | 'library' | 'major'
 
-const ModCard: FC<
-   IMod & {
-      onHover?: () => void
-      onBlur?: () => void
-   }
-> = ({ websiteUrl, name, icon, library, pages, slug, highlight, fade, ...events }) => {
+export type ModProps = IMod & {
+   highlight?: boolean
+   fade?: boolean
+   onHover?: () => void
+   onBlur?: () => void
+}
+
+const ICON_SIZE = 200
+
+const ModCard: FC<ModProps> = ({ websiteUrl, name, icon, library, pages, slug, highlight, fade, ...events }) => {
    const scheme = useMemo<Scheme | undefined>(() => {
       if (highlight) return 'highlighted'
       if (library) return 'library'
@@ -33,17 +38,19 @@ const ModCard: FC<
    )
    const tooltip = `${info} (${pages?.map(p => p.title).join(', ')})`
 
-   return (
-      <InvisibleLink href={websiteUrl}>
-         <Card fade={fade} scheme={scheme} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
-            <img alt={name} src={icon} />
-            <h3>{name}</h3>
-            {library && <Lib>Library</Lib>}
+   const card = (
+      <Card fade={fade} scheme={scheme} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
+         {icon ? <img alt={name} src={icon} /> : <Image alt={name} src='/missing-icon.png' height={ICON_SIZE} width={ICON_SIZE} />}
+         <h3>{name}</h3>
+         {library && <Lib>Library</Lib>}
 
-            {pages && pages.length > 0 && <Info data-tip={tooltip} data-for='mod-info' />}
-         </Card>
-      </InvisibleLink>
+         {pages && pages.length > 0 && <Info data-tip={tooltip} data-for='mod-info' />}
+      </Card>
    )
+
+   if (!websiteUrl) return card
+
+   return <InvisibleLink href={websiteUrl}>{card}</InvisibleLink>
 }
 
 const Info = styled.span`
@@ -112,7 +119,7 @@ const Card = styled.div<{ glow?: boolean; fade?: boolean; scheme?: Scheme }>`
       `}
 
    transform: translateY(0);
-   transition: background 0.1s linear, color 0.1s linear, opacity 0.4s linear;
+   transition: background 0.1s linear, color 0.1s linear, opacity 0.4s linear, transform 0.2s ease;
 
    &:hover {
       transform: translateY(-0.4rem);
@@ -133,7 +140,7 @@ const Card = styled.div<{ glow?: boolean; fade?: boolean; scheme?: Scheme }>`
 
    img {
       background: ${p => darken(p.theme.darker * 2, p.theme.bg)};
-      height: 200px;
+      height: ${ICON_SIZE}px;
    }
 `
 

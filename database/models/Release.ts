@@ -9,7 +9,7 @@ export interface IRelease extends Model {
    name?: string
    version: string
    date: string
-   url: string
+   url?: string
    changelog: string
    mods: IMod[]
 }
@@ -25,10 +25,7 @@ const schema = new Schema({
       type: String,
       required: true,
    },
-   url: {
-      type: String,
-      required: true,
-   },
+   url: String,
    changelog: {
       type: String,
       required: true,

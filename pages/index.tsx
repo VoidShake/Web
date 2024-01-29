@@ -20,7 +20,7 @@ const Page: FC<{ packs: Partial<IPack>[] }> = ({ packs }) => (
          {packs.map(pack => (
             <Link key={pack._id} href={`/${pack.slug}`}>
                <li>
-                  <img alt={pack.name} src={pack.assets?.icon} />
+                  {pack.assets?.icon && <img alt={pack.name} src={pack.assets.icon} />}
                   <h2>{pack.name}</h2>
                </li>
             </Link>

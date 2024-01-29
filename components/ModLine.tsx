@@ -22,7 +22,7 @@ export enum Change {
 export function getChange({ from, to }: Partial<VersionedMod>): Change {
    if (!from) return Change.added
    if (!to) return Change.removed
-   if (from.date !== to.date) return Change.changed
+   if (from !== to) return Change.changed
    return Change.unchanged
 }
 
@@ -46,11 +46,11 @@ const ModLine: FC<VersionedMod> = ({ name, from, to, ...props }) => {
          <span>{name}</span>
 
          <Version change={change}>
-            <Right>{change === Change.changed && to?.file}</Right>
+            <Right>{change === Change.changed && to}</Right>
 
             {createElement(icon, { size: '1rem' })}
 
-            <Left>{from?.file ?? to?.file}</Left>
+            <Left>{from ?? to}</Left>
          </Version>
       </Style>
    )
@@ -81,7 +81,7 @@ export const ChangeStyle = (p: { theme: Theme; change: Change }) => css`
 
    ${p.change === Change.unchanged &&
    css`
-      background: ${darken(p.theme.darker, p.theme.bg)}; ;
+      background: ${darken(p.theme.darker, p.theme.bg)};
    `}
 `
 

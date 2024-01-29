@@ -2,42 +2,29 @@ import { Schema } from 'mongoose'
 import { IPage } from './Page'
 
 export interface IMod {
-   cfID: number
+   id: string
    name: string
-   library: boolean
+   library?: boolean
    websiteUrl?: string
    summary?: string
    slug: string
    icon?: string
    popularityScore?: number
-   highlight?: boolean
-   fade?: boolean
-   categories: Array<{
-      id: number
-      name: string
-      url: string
-      iconUrl: string
-   }>
-   version: {
-      date: string
-      file: string
-   }
+   categories: string[]
+   version?: string
    pages?: Array<IPage>
 }
 
 const schema = new Schema({
-   cfID: {
-      type: Number,
+   id: {
+      type: String,
       required: true,
    },
    name: {
       type: String,
       required: true,
    },
-   library: {
-      type: Boolean,
-      required: true,
-   },
+   library: Boolean,
    websiteUrl: String,
    wikiUrl: String,
    issuesUrl: String,
@@ -49,18 +36,8 @@ const schema = new Schema({
    },
    icon: String,
    popularityScore: Number,
-   categories: [
-      new Schema({
-         id: { type: Number, required: false },
-         name: { type: String, required: true },
-         url: { type: String, required: true },
-         iconUrl: { type: String, required: false },
-      }),
-   ],
-   version: new Schema({
-      date: { type: String, required: true },
-      file: { type: String, required: true },
-   }),
+   categories: [{ type: String, required: false }],
+   version: String,
 })
 
 export default schema

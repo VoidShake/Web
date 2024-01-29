@@ -3,12 +3,13 @@ import { Clock, Cog, Download } from '@styled-icons/fa-solid'
 import { StyledIcon } from '@styled-icons/styled-icon'
 import { GetServerSideProps } from 'next'
 import { getSession, useSession } from 'next-auth/react'
-import { createElement, FC, useMemo, useState } from 'react'
+import { FC, createElement, useMemo, useState } from 'react'
 import Background from '../../components/Background'
 import Banner from '../../components/Banner'
 import Layout from '../../components/Layout'
 import Line from '../../components/Line'
 import Link from '../../components/Link'
+import { ModProps } from '../../components/ModCard'
 import Modlist from '../../components/Modlist'
 import Pages, { LinkPage } from '../../components/Pages'
 import Title from '../../components/Title'
@@ -37,7 +38,7 @@ const Page: FC<
       [props.pages, hoveredMod]
    )
 
-   const mods = useMemo(
+   const mods = useMemo<ModProps[]>(
       () =>
          props.mods.map(mod => ({
             ...mod,
