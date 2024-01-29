@@ -3,7 +3,7 @@
    "version": "1.0.0",
    "scripts": {
       "dev": "next",
-      "build": "next build",
+      "build": "yarn prepare && next build",
       "start": "next start",
       "prepare": "yarn lang:extract && yarn lang:compile",
       "type-check": "tsc --noEmit",
