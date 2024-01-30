@@ -4,6 +4,9 @@ import { IPage } from './Page'
 export interface IMod {
    id: string
    name: string
+   /**
+    * @deprecated
+    */
    library?: boolean
    websiteUrl?: string
    summary?: string

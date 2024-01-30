@@ -4,49 +4,51 @@ import { flatten, uniq } from 'lodash'
 import { invert } from 'polished'
 import { FC, useCallback, useMemo, useState } from 'react'
 import { IMod } from '../database/models/Mod'
-import ModCard, { ModProps } from './ModCard'
+import ModCard, { LIB_CATEGORIES, ModProps, isLibrary } from './ModCard'
 import useTooltip from './hooks/useTooltip'
 
-// TODO
-const HIDDEN_CATEGORIES = ['4780']
+const HIDDEN_CATEGORIES: string[] = ['addons', 'miscellaneous']
 
 const Modlist: FC<{
    mods: ModProps[]
    onHover?: (mod?: IMod) => void
-}> = ({ mods, ...events }) => {
+}> = ({ mods: rawMods, ...events }) => {
    const [hoveredCategory, hoverCategory] = useState<string>()
    const [selectedCategory, selectCategory] = useState<string>()
 
-   const libs = useMemo(() => mods.filter(m => m.library).length, [mods])
-   const categories = useMemo(() => uniq(flatten(mods.map(m => m.categories))).filter(c => !HIDDEN_CATEGORIES.includes(c)), [mods])
+   const mods = useMemo(() => rawMods.map(({ library, ...it }) => (library ? { ...it, categories: [...it.categories, LIB_CATEGORIES[0]] } : it)), [rawMods])
+
+   const categories = useMemo(() => uniq(flatten(mods.filter(it => !isLibrary(it)).map(m => m.categories))).filter(c => !HIDDEN_CATEGORIES.includes(c)), [mods])
 
    const rankOf = useCallback((mod: IMod) => {
       let rank = mod.popularityScore ?? 0
-      if (mod.library) rank -= 100000000000
+      if (isLibrary(mod)) rank -= 100000000000
       if (mod.pages?.some(p => p.mods.find(m => m.slug === mod.slug && m.relevance === 'major'))) rank += 1000000000
       return rank
    }, [])
 
-   const [librariesShown, showLibraries] = useState(false)
-   const filtered = useMemo<ModProps[]>(() => (librariesShown ? mods : mods.filter(it => !it.library)), [mods, librariesShown])
+   const librariesShown = useMemo(() => LIB_CATEGORIES.includes(selectedCategory!), [selectedCategory])
 
-   const sorted = useMemo<ModProps[]>(
+   const filtered = useMemo<ModProps[]>(
       () =>
-         filtered
+         mods
             .filter(m => !selectedCategory || m.categories.some(c => c === selectedCategory))
             .map(m => ({ ...m, highlight: m.highlight || m.categories.some(c => c === hoveredCategory) }))
             .sort((a, b) => rankOf(b) - rankOf(a)),
-      [filtered, hoveredCategory, selectedCategory, rankOf]
+      [mods, hoveredCategory, selectedCategory, rankOf]
    )
 
-   const somethingHighlighted = useMemo(() => sorted.some(m => m.highlight), [sorted])
+   const nonLibs = useMemo<ModProps[]>(() => filtered.filter(it => !isLibrary(it)), [filtered])
+   const shown = useMemo<ModProps[]>(() => (librariesShown ? filtered : nonLibs), [librariesShown, filtered, nonLibs])
+
+   const somethingHighlighted = useMemo(() => shown.some(m => m.highlight), [shown])
    const tooltip = useTooltip('mod-info')
 
    return (
       <Container>
          {tooltip}
          <p>
-            {mods.length - libs} mods ({libs} libraries <input type='checkbox' checked={librariesShown} onChange={e => showLibraries(e.target.checked)} />)
+            {nonLibs.length} mods ({filtered.length - nonLibs.length} libraries)
          </p>
 
          <Categories>
@@ -63,7 +65,7 @@ const Modlist: FC<{
          </Categories>
 
          <Grid>
-            {sorted.map(mod => (
+            {shown.map(mod => (
                <ModCard {...mod} key={mod.id} onHover={() => events.onHover?.(mod)} onBlur={() => events.onHover?.()} fade={somethingHighlighted && !mod.highlight} />
             ))}
          </Grid>

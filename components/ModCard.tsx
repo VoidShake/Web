@@ -7,6 +7,12 @@ import { useIntl } from 'react-intl'
 import { IMod } from '../database/models/Mod'
 import InvisibleLink from './InvisibleLink'
 
+export const LIB_CATEGORIES: ReadonlyArray<string> = ['library', 'api-and-library']
+
+export function isLibrary(mod: Pick<IMod, 'categories'>) {
+   return mod.categories.some(it => LIB_CATEGORIES.includes(it))
+}
+
 type Scheme = 'highlighted' | 'library' | 'major'
 
 export type ModProps = IMod & {
@@ -18,12 +24,12 @@ export type ModProps = IMod & {
 
 const ICON_SIZE = 200
 
-const ModCard: FC<ModProps> = ({ websiteUrl, name, icon, library, pages, slug, highlight, fade, ...events }) => {
+const ModCard: FC<ModProps> = ({ websiteUrl, categories, name, icon, pages, slug, highlight, fade, ...events }) => {
    const scheme = useMemo<Scheme | undefined>(() => {
       if (highlight) return 'highlighted'
-      if (library) return 'library'
+      if (isLibrary({ categories })) return 'library'
       if (pages?.some(p => p.mods.find(m => m.slug === slug && m.relevance === 'major'))) return 'major'
-   }, [library, pages, highlight, slug])
+   }, [pages, highlight, slug])
 
    const { formatMessage } = useIntl()
 
@@ -42,7 +48,6 @@ const ModCard: FC<ModProps> = ({ websiteUrl, name, icon, library, pages, slug, h
       <Card fade={fade} scheme={scheme} onMouseOver={events.onHover} onMouseLeave={events.onBlur}>
          {icon ? <img alt={name} src={icon} /> : <Image alt={name} src='/missing-icon.png' height={ICON_SIZE} width={ICON_SIZE} />}
          <h3>{name}</h3>
-         {library && <Lib>Library</Lib>}
 
          {pages && pages.length > 0 && <Info data-tip={tooltip} data-for='mod-info' />}
       </Card>
@@ -75,14 +80,6 @@ const Info = styled.span`
    }
 `
 
-const Lib = styled.span`
-   background: #0003;
-   margin: 0.4rem;
-   margin-left: auto;
-   padding: 0.2rem 0.5rem;
-   border-radius: 99999px;
-`
-
 const Card = styled.div<{ glow?: boolean; fade?: boolean; scheme?: Scheme }>`
    position: relative;
    text-align: center;
@@ -100,7 +97,7 @@ const Card = styled.div<{ glow?: boolean; fade?: boolean; scheme?: Scheme }>`
    ${p =>
       p.scheme === 'library' &&
       css`
-         background: '#559aed77';
+         background: #559aed77;
       `}
 
    ${p =>
@@ -135,7 +132,7 @@ const Card = styled.div<{ glow?: boolean; fade?: boolean; scheme?: Scheme }>`
       'title' 4rem;
 
    h3 {
-      padding: 1rem 0;
+      padding: 1rem 0.5rem;
    }
 
    img {
